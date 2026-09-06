@@ -1,4 +1,4 @@
-import { SUPPORT_EMAIL } from "./types";
+import { supportEmail } from "./config";
 import { isMetaStale } from "./sync";
 import type { SyncMeta } from "./types";
 
@@ -23,6 +23,6 @@ export function formatUpdatedAgo(lastSuccessIso: string | null, nowMs: number = 
 export function staleLine(meta: SyncMeta | null, nowMs: number = Date.now()): { text: string; stale: boolean } {
   const ago = formatUpdatedAgo(meta?.lastSuccess ?? null, nowMs);
   const stale = isMetaStale(meta, nowMs) || (meta?.errors?.length ?? 0) > 0;
-  if (stale) return { text: `${ago}, please email ${SUPPORT_EMAIL} for help`, stale: true };
+  if (stale) return { text: `${ago}, please email ${supportEmail()} for help`, stale: true };
   return { text: ago, stale: false };
 }

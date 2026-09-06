@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminAuth } from "@/lib/admin";
+import { serverSchoolDomain, testEmail } from "@/lib/config";
 
 export const runtime = "nodejs";
 
@@ -14,8 +15,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
   const body = (await request.json().catch(() => ({}))) as { email?: string };
-  const email = body.email ?? "tester@example-school.org";
-  if (!email.endsWith("@example-school.org")) {
+  const email = body.email ?? testEmail("tester");
+  if (!email.endsWith(`@${serverSchoolDomain()}`)) {
     return NextResponse.json({ error: "school email only" }, { status: 400 });
   }
   const password = `dev-${process.env.CRON_SECRET ?? "local"}-pw`;

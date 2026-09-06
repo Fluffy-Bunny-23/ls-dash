@@ -3,6 +3,7 @@ import { initializeApp, type FirebaseApp } from "firebase/app";
 import { connectAuthEmulator, getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { connectFirestoreEmulator, doc, getDoc, getFirestore, setDoc } from "firebase/firestore";
 import { getAdminAuth, getAdminDb } from "@/lib/admin";
+import { DEMO_PROJECT_ID, testEmail } from "@/lib/config";
 
 const EMU = !!process.env.FIRESTORE_EMULATOR_HOST;
 const AUTH_EMU = process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST ?? "127.0.0.1:9090";
@@ -12,8 +13,8 @@ function clientApp(name: string): FirebaseApp {
   return initializeApp(
     {
       apiKey: "dummy-key-for-emulator",
-      authDomain: "demo-school-dash.firebaseapp.com",
-      projectId: process.env.FIREBASE_PROJECT_ID ?? "demo-school-dash",
+      authDomain: `${DEMO_PROJECT_ID}.firebaseapp.com`,
+      projectId: process.env.FIREBASE_PROJECT_ID ?? DEMO_PROJECT_ID,
     },
     name,
   );
@@ -71,7 +72,7 @@ describe.skipIf(!EMU)("firestore rules", () => {
     }
 
     // 2. Verified school email reads allowed.
-    const schoolDb = await signedInApp("school", "tester@example-school.org", true);
+    const schoolDb = await signedInApp("school", testEmail("tester"), true);
     const snap = await getDoc(doc(schoolDb, "days", "2026-09-08"));
     expect(snap.exists()).toBe(true);
 
@@ -80,7 +81,7 @@ describe.skipIf(!EMU)("firestore rules", () => {
     await expect(getDoc(doc(otherDb, "days", "2026-09-08"))).rejects.toThrow(/permission|no matching allow|false for .get.|permission_denied/i);
 
     // 4. Unverified school email denied.
-    const unverifiedDb = await signedInApp("unverified", "tester@example-school.org", false);
+    const unverifiedDb = await signedInApp("unverified", testEmail("tester"), false);
     await expect(getDoc(doc(unverifiedDb, "days", "2026-09-08"))).rejects.toThrow(/permission|no matching allow|false for .get.|permission_denied/i);
 
     // 5. Client writes denied even for verified school users.

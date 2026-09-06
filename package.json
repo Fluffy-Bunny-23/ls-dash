@@ -9,7 +9,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "seed": "tsx scripts/seed.ts",
-    "emulators": "firebase emulators:start --only auth,firestore"
+    "emulators": "firebase emulators:start --only auth,firestore",
+    "setup": "node scripts/render-rules.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

@@ -3,6 +3,9 @@ import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 
 const BASE = process.env.LSDASH_BASE ?? "http://127.0.0.1:3100";
+// Expected support contact: same default as the app (NEXT_PUBLIC_SUPPORT_EMAIL).
+// Set LSDASH_SUPPORT_EMAIL when running against a deployment with a real one.
+const SUPPORT_EMAIL = process.env.LSDASH_SUPPORT_EMAIL ?? "support@example-school.org";
 const EVIDENCE = "/tmp/lsdash-evidence";
 mkdirSync(EVIDENCE, { recursive: true });
 
@@ -314,7 +317,7 @@ try {
     await cdp.goto(`${BASE}/?d=2026-09-08`);
     await cdp.waitFor(() => document.querySelector('[data-testid="sync-footer"]'));
   }
-  check("fresh footer has no support-email badge", footer.stale === "false" && !footer.text.includes("support"), footer.text + " | console: " + conmsgs.slice(0, 6).join(" / "));
+  check("fresh footer has no support-email badge", footer.stale === "false" && !footer.text.includes(SUPPORT_EMAIL.split("@")[0]), footer.text + " | console: " + conmsgs.slice(0, 6).join(" / "));
   cdp.ws.removeEventListener("message", conhandler);
   // ---- 9. Stale sync => support-email badge, then restore fresh ----
   // (Admin SDK via set-meta.mjs: emulator REST enforces rules like prod.)
@@ -326,7 +329,7 @@ try {
   const staleFooter = await cdp.eval(() => document.querySelector('[data-testid="sync-footer"]').textContent);
   check(
     "stale badge shows updated-ago + support email",
-    staleFooter.includes("ago, please email support@example-school.org for help"),
+    staleFooter.includes(`ago, please email ${SUPPORT_EMAIL} for help`),
     staleFooter,
   );
   await cdp.shot("07-stale.png");

@@ -8,6 +8,7 @@ import {
   connectFirestoreEmulator,
   type Firestore,
 } from "firebase/firestore";
+import { DEMO_PROJECT_ID } from "./config";
 
 let app: FirebaseApp | null = null;
 let auth: Auth | null = null;
@@ -40,8 +41,8 @@ function getApp(): FirebaseApp {
     getApps()[0] ??
     initializeApp({
       apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ?? "dummy-key-for-emulator",
-      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? "demo-school-dash.firebaseapp.com",
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "demo-school-dash",
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ?? `${DEMO_PROJECT_ID}.firebaseapp.com`,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? DEMO_PROJECT_ID,
     });
   return app;
 }

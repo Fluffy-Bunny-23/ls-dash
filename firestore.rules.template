@@ -6,13 +6,13 @@ service cloud.firestore {
     match /days/{dayId} {
       allow read: if request.auth != null
         && request.auth.token.email_verified == true
-        && request.auth.token.email.matches('.*@example-school\\.org$');
+        && request.auth.token.email.matches('.*@__SCHOOL_DOMAIN__$');
       allow write: if false;
     }
     match /meta/{docId} {
       allow read: if request.auth != null
         && request.auth.token.email_verified == true
-        && request.auth.token.email.matches('.*@example-school\\.org$');
+        && request.auth.token.email.matches('.*@__SCHOOL_DOMAIN__$');
       allow write: if false;
     }
     match /{document=**} {

@@ -38,8 +38,6 @@ export interface SyncMeta {
   errors: string[];
 }
 
-export const SUPPORT_EMAIL = "support@example-school.org";
-
 /** Cron is stale when the last success is older than this. Daily 5am PT
  *  cron + same-day viewing => 26h gives ample headroom without false alarms. */
 export const STALE_AFTER_MS = 26 * 60 * 60 * 1000;

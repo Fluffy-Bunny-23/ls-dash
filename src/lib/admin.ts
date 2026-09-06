@@ -1,11 +1,12 @@
 /** Server-only Firebase Admin helper for the cron writer. */
 import admin from "firebase-admin";
+import { DEMO_PROJECT_ID } from "./config";
 
 let inited = false;
 
 export function getAdminDb(): admin.firestore.Firestore {
   if (!admin.apps.length) {
-    const projectId = process.env.FIREBASE_PROJECT_ID ?? "demo-school-dash";
+    const projectId = process.env.FIREBASE_PROJECT_ID ?? DEMO_PROJECT_ID;
     const svc = process.env.FIREBASE_SERVICE_ACCOUNT;
     if (svc) {
       admin.initializeApp({

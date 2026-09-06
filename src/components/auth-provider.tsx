@@ -10,6 +10,7 @@ import {
   type User,
 } from "firebase/auth";
 import { getFirebaseAuth, usingEmulators } from "@/lib/firebase-client";
+import { schoolDomain, testEmail } from "@/lib/config";
 
 interface AuthState {
   user: User | null;
@@ -44,8 +45,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    // Hint the hosted domain; rules enforce example-school.org regardless.
-    provider.setCustomParameters({ hd: "example-school.org" });
+    // Hint the hosted domain; rules enforce it regardless.
+    provider.setCustomParameters({ hd: schoolDomain() });
     await signInWithPopup(getFirebaseAuth(), provider);
   };
 
@@ -54,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const res = await fetch("/api/dev/token", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email: "tester@example-school.org" }),
+      body: JSON.stringify({ email: testEmail("tester") }),
     });
     if (!res.ok) throw new Error("dev sign-in unavailable");
     const { email, password } = (await res.json()) as { email: string; password: string };
@@ -65,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signOut(getFirebaseAuth());
   };
 
-  const schoolUser = !!user?.email?.endsWith("@example-school.org");
+  const schoolUser = !!user?.email?.endsWith(`@${schoolDomain()}`);
 
   return (
     <AuthCtx.Provider

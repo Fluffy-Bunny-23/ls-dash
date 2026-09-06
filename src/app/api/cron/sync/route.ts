@@ -19,6 +19,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const todayId = todayPtId();
   const nowIso = new Date().toISOString();
   const metaRef = db.collection("meta").doc("sync");
+  const icalUrl = process.env.ICAL_URL;
+  if (!icalUrl) {
+    return NextResponse.json({ ok: false, error: "ICAL_URL not configured" }, { status: 500 });
+  }
 
   try {
     const result = await runSync({
@@ -30,7 +34,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       sageFetch: fetch,
       db,
       todayId,
-      icalUrl: process.env.ICAL_URL ?? "https://www.example-school.org/calendar/calendar_436.ics",
+      icalUrl,
       lunchMenuId: process.env.SAGE_LUNCH_MENU_ID ?? "139455",
       breakfastMenuId: process.env.SAGE_BREAKFAST_MENU_ID ?? "138778",
     });

@@ -5,7 +5,7 @@ special schedules / days off, and Sage lunch + breakfast entrées. Built per
 `ref/lsdash-plan.md`.
 
 - Stack: Next.js App Router + TypeScript + Tailwind + shadcn UI, Vercel.
-  Brand theme: shadcn `--primary` = Example maroon `#820024`, `--secondary` =
+  Brand theme: shadcn `--primary` = school-brand maroon `#820024`, `--secondary` =
   gold `#ECAA1F` (see `:root` in `src/app/globals.css`). Components are stock
   `shadcn add` output (Base UI primitives); `cn` comes from `@/lib/utils`
   (a re-export of the `cn` package, which generated `ui/*` files import directly).
@@ -15,11 +15,28 @@ special schedules / days off, and Sage lunch + breakfast entrées. Built per
   call per weekday — weekly payloads don't carry per-day Daily items
   (verified against the live site + API). Stored as `breakfast.daily`, shown
   in the Today view; Month cells stay entrée-first per the plan.
-- Auth: Google + Firebase, `example-school.org` only. Logged-out users see a
+- Auth: Google + Firebase, school domain only (see School identity below).
+  Logged-out users see a
   generic wall that reveals nothing school-specific.
 - Reads: client → Firestore directly (no `/api/*` read routes).
 - Writes: Vercel Cron → `GET /api/cron/sync` (Admin SDK) only. Clients never write.
 - Timezone `America/Los_Angeles`; cron `0 12 * * *` (12:00 UTC ≈ 5am PT).
+
+## School identity (env, never hardcoded)
+
+Nothing school-specific lives in this repo — no email domain, no support
+address, no calendar URL. Deployments configure them:
+
+| Var | Used by | Example |
+|---|---|---|
+| `NEXT_PUBLIC_SCHOOL_DOMAIN` | client auth check + Google `hd` hint | `example-school.org` |
+| `SCHOOL_DOMAIN` | dev-token route, `render-rules.mjs` (falls back to the above) | |
+| `NEXT_PUBLIC_SUPPORT_EMAIL` | stale badge | `support@example-school.org` |
+| `ICAL_URL` | cron sync (required, no default) | |
+
+`firestore.rules` is GENERATED: edit `firestore.rules.template`, then run
+`npm run setup` (reads `SCHOOL_DOMAIN`). The generated file is gitignored —
+never commit a rendered file with a real domain.
 
 ## Dev (emulators only — never touch prod)
 
@@ -66,16 +83,19 @@ never hits the network; the seed uses entrée names from `ref/Sage*.har`.
 ## Deploy (Vercel + Firebase)
 
 1. Firebase console: create project, enable Google auth, create Firestore.
-   Deploy rules: `firebase deploy --only firestore:rules`.
+   Render the rules for your domain first (`SCHOOL_DOMAIN=… npm run setup`),
+   then deploy rules: `firebase deploy --only firestore:rules`.
 2. Vercel env — server-only (never `NEXT_PUBLIC_`):
-   `FIREBASE_SERVICE_ACCOUNT` (Admin JSON), `CRON_SECRET` (random 16+ chars).
-   Client: `NEXT_PUBLIC_FIREBASE_API_KEY`, `_AUTH_DOMAIN`, `_PROJECT_ID`.
-   Optional overrides: `ICAL_URL`, `SAGE_LUNCH_MENU_ID=139455`,
+   `FIREBASE_SERVICE_ACCOUNT` (Admin JSON), `CRON_SECRET` (random 16+ chars),
+   `SCHOOL_DOMAIN`, `ICAL_URL` (required).
+   Client: `NEXT_PUBLIC_FIREBASE_API_KEY`, `_AUTH_DOMAIN`, `_PROJECT_ID`,
+   plus `NEXT_PUBLIC_SCHOOL_DOMAIN` and `NEXT_PUBLIC_SUPPORT_EMAIL`.
+   Optional overrides: `SAGE_LUNCH_MENU_ID=139455`,
    `SAGE_BREAKFAST_MENU_ID=138778`. Do **not** set the `*_EMULATOR_HOST` vars.
 3. `vercel.json` already schedules `GET /api/cron/sync` at `0 12 * * *`.
    Vercel sends `Authorization: Bearer <CRON_SECRET>`; anything else gets 401.
 4. Without emulator env vars, `/api/dev/token` returns 404 and the Dev
-   sign-in button is hidden — Google (`hd=example-school.org`) is the only path.
+   sign-in button is hidden — Google (hosted domain hint) is the only path.
 
 ## Notes / deviations from `ref/lsdash-plan.md`
 

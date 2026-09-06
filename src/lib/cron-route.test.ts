@@ -7,6 +7,17 @@ import { addDaysId, retentionWindow, todayPtId } from "@/lib/dates";
 
 const EMU = !!process.env.FIRESTORE_EMULATOR_HOST;
 const SAMPLE_ICS = readFileSync(join(__dirname, "__fixtures__", "calendar_436.sample.ics"), "utf8");
+const TEST_ICAL_URL = "https://calendar.example-school.org/feed.ics";
+
+/** The route requires ICAL_URL; point it at a stubbed URL for the duration. */
+function stubIcalEnv(): () => void {
+  const prev = process.env.ICAL_URL;
+  process.env.ICAL_URL = TEST_ICAL_URL;
+  return () => {
+    if (prev === undefined) delete process.env.ICAL_URL;
+    else process.env.ICAL_URL = prev;
+  };
+}
 
 function mondayPlus(dateMmDdYyyy: string, n: number): string {
   const [m, d, y] = dateMmDdYyyy.split("/").map(Number);
@@ -22,7 +33,7 @@ function stubFetch(opts: { icalOk?: boolean; sageEmpty?: boolean } = {}) {
   const realFetch = globalThis.fetch;
   const stub = vi.fn(async (input: unknown, _init?: unknown) => {
     const url = String(input);
-    if (url.includes("calendar_436") || url.includes("icalcache")) {
+    if (url.includes("calendar_436") || url.includes("icalcache") || url.endsWith(".ics")) {
       if (!icalOk) return new Response("ics down", { status: 500 });
       return new Response(SAMPLE_ICS, { status: 200 });
     }
@@ -105,6 +116,7 @@ describe.skipIf(!EMU)("cron route", () => {
   });
 
   it("with the secret: writes the window and prunes to ±30d", async () => {
+    const restoreEnv = stubIcalEnv();
     const restore = stubFetch();
     try {
       const { GET } = await import("@/app/api/cron/sync/route");
@@ -161,10 +173,12 @@ describe.skipIf(!EMU)("cron route", () => {
       expect(meta["datesWritten"]).toBe(expected);
     } finally {
       restore();
+      restoreEnv();
     }
   });
 
   it("on fetch failure: 500s, records the error, and never wipes the window", async () => {
+    const restoreEnv = stubIcalEnv();
     const restore = stubFetch({ icalOk: false });
     try {
       const { GET } = await import("@/app/api/cron/sync/route");
@@ -191,10 +205,12 @@ describe.skipIf(!EMU)("cron route", () => {
       if (beforeSuccess) expect(meta["lastSuccess"]).toBe(beforeSuccess);
     } finally {
       restore();
+      restoreEnv();
     }
   });
 
   it("warns (not silent) when Sage returns nothing on school days", async () => {
+    const restoreEnv = stubIcalEnv();
     const restore = stubFetch({ sageEmpty: true });
     try {
       const { GET } = await import("@/app/api/cron/sync/route");
@@ -212,6 +228,7 @@ describe.skipIf(!EMU)("cron route", () => {
       expect((meta["errors"] as string[]).length).toBeGreaterThan(0); // surfaces the stale badge
     } finally {
       restore();
+      restoreEnv();
     }
   });
 });

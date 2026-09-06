@@ -5,6 +5,9 @@ dist/
 coverage/
 .firebase/
 .firebaserc
+# Generated from firestore.rules.template by `npm run setup` — never commit
+# a rendered file (it may contain the real school domain).
+/firestore.rules
 *.log
 .DS_Store
 .env.local

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { PLACEHOLDER_SUPPORT_EMAIL, supportEmail } from "./config";
 import { formatUpdatedAgo, staleLine } from "./format";
 import { datesToPrune, isMetaStale, mergeDay } from "./sync";
 import { extractBreakfast, extractLunch } from "./sage";
@@ -23,7 +24,7 @@ describe("stale badge", () => {
     );
     expect(r.stale).toBe(true);
     expect(r.text).toBe(
-      "updated 2 days ago, please email support@example-school.org for help",
+      `updated 2 days ago, please email ${supportEmail()} for help`,
     );
   });
   it("sync errors force the badge even when fresh", () => {
@@ -32,7 +33,9 @@ describe("stale badge", () => {
       now,
     );
     expect(r.stale).toBe(true);
-    expect(r.text).toContain("support@example-school.org");
+    expect(r.text).toContain(supportEmail());
+    // Default placeholder (a deployment overrides it via env).
+    expect(PLACEHOLDER_SUPPORT_EMAIL).toContain("@");
   });
   it("missing meta is stale", () => {
     expect(isMetaStale(null, now)).toBe(true);

@@ -96,14 +96,18 @@ navigable), and fresh `meta/sync`.
 ## 5. Test
 
 ```sh
-cd <repo> && export FIRESTORE_EMULATOR_HOST=127.0.0.1:8081 \
+cd <repo> && npm run setup && export FIRESTORE_EMULATOR_HOST=127.0.0.1:8081 \
   FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9090 FIREBASE_PROJECT_ID=demo-school-dash \
-  CRON_SECRET=CHANGE-ME \
+  CRON_SECRET=local-test-secret \
   NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9090 \
   NEXT_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_HOST=127.0.0.1:8081
 npx tsc --noEmit
 npx vitest run          # 41 tests: ical, sage (both HARs), dates, sync/format, cron, rules
 ```
+
+`npm run setup` renders `firestore.rules` from the template (placeholder
+domain by default; set `SCHOOL_DOMAIN` for a real one — the rendered file is
+gitignored, never commit it).
 
 Warnings: the cron tests rewrite `days/*` via Admin SDK and clean up in
 `afterAll`, but ALWAYS `npm run seed` again before browser testing.
@@ -122,7 +126,7 @@ FIRESTORE_EMULATOR_HOST=127.0.0.1:8081
 
 ```sh
 cd <repo> && node scripts/browser-check.mjs                 # vs local dev (port 3000)
-LSDASH_BASE=https://3000.example-proxy.local node scripts/browser-check.mjs  # vs public URL
+LSDASH_BASE=https://<app-host> node scripts/browser-check.mjs  # vs public URL
 ```
 
 21 checks: generic login wall (copy + theme scan), dev-sign-in click, Today
@@ -137,11 +141,16 @@ by convention). If a run wedges, check for a stale chrome on 9333
 One-off helpers: `scripts/set-meta.mjs <stale|fresh>` (Admin SDK; emulator
 REST enforces rules like prod, so REST can't write meta).
 
-## 7. Public URLs (nginx, TLS) — current wiring
+## 7. Public URLs (nginx, TLS) — operator wiring, not repo content
 
-- App: `https://3000.example-proxy.local` → VM port 3000
-- Auth emulator: `https://9090.example-proxy.local` → VM port 9090
-- Firestore emulator: `https://8081.example-proxy.local` → VM port 8081
+Keep the actual hostnames out of the repo (it's public). The pattern is:
+
+- App: `https://<app-host>` → VM port 3000
+- Auth emulator: `https://<auth-host>` → VM port 9090
+- Firestore emulator: `https://<firestore-host>` → VM port 8081
+
+with `NEXT_PUBLIC_FIREBASE_{AUTH,FIRESTORE}_EMULATOR_HOST` set to the two
+backend hosts and `NEXT_PUBLIC_FIREBASE_EMULATOR_SSL=true`.
 
 The app page is HTTPS, so backends must be HTTPS too (browsers block
 plain-HTTP backends as mixed content). `connectFirestoreEmulator()` only does
@@ -155,7 +164,7 @@ self-signed TLS bridge (`scripts/tls-bridge.mjs`).
 
 - Emulator-minted **custom tokens drop `email`/`email_verified` claims** —
   rules see no email. Dev sign-in therefore uses email+password users created
-  via Admin SDK (`/api/dev/token` provisions `tester@example-school.org`;
+  via Admin SDK (`/api/dev/token` provisions `tester@<school-domain>`;
   route 404s without the emulator env).
 - `accounts:update` with `emailVerified:true` is **ignored** by the emulator —
   always set the flag via Admin SDK `createUser`/`updateUser`.
