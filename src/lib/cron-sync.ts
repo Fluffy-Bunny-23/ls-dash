@@ -48,6 +48,7 @@ function anchorForId(dateId: string): string {
 export async function runSync(deps: SyncDeps): Promise<SyncResult> {
   const { fetchText, sageFetch, db, todayId, icalUrl, lunchMenuId, breakfastMenuId } = deps;
   const { startId, endId } = retentionWindow(todayId);
+  const warnings: string[] = [];
 
   // 1. iCal feed across the window.
   const icalText = await fetchText(icalUrl);
@@ -74,6 +75,29 @@ export async function runSync(deps: SyncDeps): Promise<SyncResult> {
   const eventsByDate = new Map<string, string>();
   for (const m of eventMaps) for (const [date, ev] of m) eventsByDate.set(date, ev.label);
 
+  // 3b. Daily offerings (platter, beverages, accompaniments) exist only in
+  // single-day payloads — one extra call per weekday. Concurrency 5: still
+  // gentle on Sage (browsers open 6/host), but ~44 sequential calls at
+  // ~0.7s each would eat most of a 60s cron budget. Failures are isolated
+  // per date so one miss never aborts the sync.
+  const weekdayIds = rangeIds(startId, endId).filter((id) => !isWeekendId(id));
+  const dailyById = new Map<string, string[]>();
+  {
+    let cursor = 0;
+    const workers = Array.from({ length: 5 }, async () => {
+      while (cursor < weekdayIds.length) {
+        const id = weekdayIds[cursor++];
+        try {
+          const single = await fetchSingleDayMenuItems(breakfastMenuId, toSageDate(id), "Breakfast", sageFetch);
+          dailyById.set(id, extractBreakfast(single).daily);
+        } catch (e) {
+          warnings.push(`daily offerings missing for ${id}: ${(e as Error)?.message ?? e}`);
+        }
+      }
+    });
+    await Promise.all(workers);
+  }
+
   // 4. Merge + upsert weekdays only (weekends are never navigable).
   const batch = db.batch();
   let datesWritten = 0;
@@ -84,10 +108,7 @@ export async function runSync(deps: SyncDeps): Promise<SyncResult> {
     const anchor = anchorForId(id);
     const lunch = extractLunch(weekDayForId(lunchWeeks.get(anchor) ?? {}, id));
     const breakfastBase = extractBreakfast(weekDayForId(breakfastWeeks.get(anchor) ?? {}, id));
-    // Daily offerings (platter, beverages, accompaniments) exist only in
-    // single-day payloads — one extra call per weekday, sequential like the rest.
-    const breakfastSingle = await fetchSingleDayMenuItems(breakfastMenuId, toSageDate(id), "Breakfast", sageFetch);
-    const breakfast = { ...breakfastBase, daily: extractBreakfast(breakfastSingle).daily };
+    const breakfast = { ...breakfastBase, daily: dailyById.get(id) ?? [] };
     const occurrence = occurrences.get(id);
     lunchItemsTotal += lunch.all.length;
     if (occurrence && lunch.all.length === 0) schoolDaysWithoutLunch++;
@@ -119,7 +140,6 @@ export async function runSync(deps: SyncDeps): Promise<SyncResult> {
 
   // §8: menuIds can rotate yearly — an all-empty Sage response on school days
   // is surfaced as a sync warning (shows the stale badge) instead of silence.
-  const warnings: string[] = [];
   if (lunchItemsTotal === 0 && schoolDaysWithoutLunch > 0) {
     warnings.push(
       `sage lunch menu ${lunchMenuId} returned no items for ${schoolDaysWithoutLunch} school days (menuId may have rotated?)`,

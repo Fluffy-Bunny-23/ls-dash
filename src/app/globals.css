@@ -11,10 +11,6 @@
   --color-gold-soft: #f7d47c;
 }
 
-body {
-  @apply bg-stone-50 text-stone-900 antialiased;
-}
-
 @theme inline {
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
