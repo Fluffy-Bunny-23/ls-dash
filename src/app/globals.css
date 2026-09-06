@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+  --color-maroon: #820024;
+  --color-maroon-dark: #5f001a;
+  --color-gold: #ecaa1f;
+  --color-gold-soft: #f7d47c;
+}
+
+body {
+  @apply bg-stone-50 text-stone-900 antialiased;
+}
