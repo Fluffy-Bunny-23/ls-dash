@@ -7,3 +7,7 @@ coverage/
 .firebaserc
 *.log
 .DS_Store
+.env.local
+.env.*.local
+!.env.local.example
+*.tsbuildinfo
