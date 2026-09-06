@@ -13,6 +13,8 @@ export interface LunchInfo {
 export interface BreakfastInfo {
   entree: string | null;
   all: string[];
+  /** Daily-meal offerings. Absent on docs written before the field existed — readers must default to []. */
+  daily?: string[];
 }
 
 export interface DayDoc {

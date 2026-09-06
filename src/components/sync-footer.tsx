@@ -2,8 +2,8 @@
 
 import { useSyncMetaValue } from "./sync-meta-provider";
 import { staleLine } from "@/lib/format";
-import { Skeleton } from "./ui/card";
-import { cn } from "@/lib/cn";
+import { Skeleton } from "./ui/skeleton";
+import { cn } from "@/lib/utils";
 
 /** "updated X ago" footer; stale => badge with support email (§1). */
 export function SyncFooter() {

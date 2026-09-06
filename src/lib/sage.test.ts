@@ -90,6 +90,26 @@ describe("breakfast extractor (menuId 138778)", () => {
   });
 });
 
+describe("daily offerings (single-day payloads)", () => {
+  const single0908 = JSON.parse(
+    readFileSync(join(__dirname, "__fixtures__", "sage-single-0908-breakfast.json"), "utf8"),
+  ) as Parameters<typeof extractBreakfast>[0];
+
+  it("extracts Daily-meal items (platter, beverages, accompaniments)", () => {
+    const ex = extractBreakfast(single0908);
+    expect(ex.daily).toContain("Lions Mane Breakfast Platter");
+    expect(ex.daily).toContain("100% Apple Juice");
+    expect(ex.daily).toContain("Syrup");
+    // Entrée picks are unaffected by Daily items.
+    expect(ex.entree).toBe("Grilled Ham");
+  });
+  it("weekly day-objects carry no Daily key (single-day fetch required)", () => {
+    const day = breakfast.weekly["09/09/2026"] as Record<string, unknown>;
+    expect("Daily" in day).toBe(false);
+    expect(extractBreakfast(day as Parameters<typeof extractBreakfast>[0]).daily).toEqual([]);
+  });
+});
+
 describe("normalizeName", () => {
   it("collapses whitespace", () => {
     expect(normalizeName("Pho    Bar")).toBe("Pho Bar");

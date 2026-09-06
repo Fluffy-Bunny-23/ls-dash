@@ -1,0 +1,1335 @@
+{
+ "Today's Menu Features": [],
+ "Specials": [
+  {
+   "id": "504770376",
+   "menuId": "138778",
+   "recipeId": "198231",
+   "recipeType": "seasoning",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "8",
+     "name": "P.S.",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation8.png?20250917"
+    }
+   ],
+   "displayCategory": "Specials",
+   "dailyCategory": "NONE",
+   "displayStation": "P.S.",
+   "card": "3",
+   "name": "Bagel & Cream Cheese",
+   "desc": "",
+   "price": "1.30",
+   "dot": "Green/Yellow/Red",
+   "allergens": {
+    "allergenCodes": [
+     "W",
+     "G",
+     "Mi"
+    ],
+    "allergenNames": [
+     "Wheat",
+     "Gluten",
+     "Milk"
+    ],
+    "lmAllergenCodes": [
+     "E",
+     "So",
+     "Se"
+    ],
+    "lmAllergenNames": [
+     "Egg",
+     "Soy",
+     "Sesame"
+    ],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [
+     "V+"
+    ],
+    "lmLifestyleNames": [
+     "Vegan"
+    ],
+    "performanceSpotlight": {
+     "s": 0,
+     "p": 0,
+     "v": 0,
+     "cm": 0
+    }
+   },
+   "hasDetails": true
+  }
+ ],
+ "Soups": [],
+ "Salads": [],
+ "Deli": [],
+ "Entr\u00e9es": [
+  {
+   "id": "504770370",
+   "menuId": "138778",
+   "recipeId": "62822",
+   "recipeType": "Recipe",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "3",
+     "name": "The Main Ingredient\u00ae",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation3.png?20250917"
+    },
+    {
+     "id": "15",
+     "name": "Free Style\u2122",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation15.png?20250917"
+    }
+   ],
+   "displayCategory": "Entrees",
+   "dailyCategory": "NONE",
+   "displayStation": "The Main Ingredient\u00ae, Free Style\u2122",
+   "card": "0",
+   "name": "Grilled Ham",
+   "desc": "",
+   "price": "2.75",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [],
+    "lifestyleNames": [],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Protein"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504770364",
+   "menuId": "138778",
+   "recipeId": "216973",
+   "recipeType": "Recipe",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "3",
+     "name": "The Main Ingredient\u00ae",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation3.png?20250917"
+    }
+   ],
+   "displayCategory": "Entrees",
+   "dailyCategory": "NONE",
+   "displayStation": "The Main Ingredient\u00ae",
+   "card": "1",
+   "name": "Cheddar Scrambled Eggs",
+   "desc": "",
+   "price": "1.75",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [
+     "E",
+     "Mi"
+    ],
+    "allergenNames": [
+     "Egg",
+     "Milk"
+    ],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504770328",
+   "menuId": "138778",
+   "recipeId": "203043",
+   "recipeType": "Recipe",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "7",
+     "name": "Transit Fare\u00ae",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation7.png?20250917"
+    }
+   ],
+   "displayCategory": "Entrees",
+   "dailyCategory": "NONE",
+   "displayStation": "Transit Fare\u00ae",
+   "card": "0",
+   "name": "Strawberry Yogurt and Granola Parfait",
+   "desc": "",
+   "price": "4.50",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [
+     "Mi"
+    ],
+    "allergenNames": [
+     "Milk"
+    ],
+    "lmAllergenCodes": [
+     "W",
+     "G",
+     "So"
+    ],
+    "lmAllergenNames": [
+     "Wheat",
+     "Gluten",
+     "Soy"
+    ],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504770340",
+   "menuId": "138778",
+   "recipeId": "216688",
+   "recipeType": "Recipe",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "7",
+     "name": "Transit Fare\u00ae",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation7.png?20250917"
+    }
+   ],
+   "displayCategory": "Entrees",
+   "dailyCategory": "NONE",
+   "displayStation": "Transit Fare\u00ae",
+   "card": "1",
+   "name": "Berry-Chia Yogurt Parfait",
+   "desc": "",
+   "price": "4.50",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [
+     "Mi"
+    ],
+    "allergenNames": [
+     "Milk"
+    ],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504735505",
+   "menuId": "138778",
+   "recipeId": "14822",
+   "recipeType": "Recipe",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "0",
+     "name": "Stock Exchange",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation0.png?20250917"
+    }
+   ],
+   "displayCategory": "Entrees",
+   "dailyCategory": "NONE",
+   "displayStation": "Daily Offering",
+   "card": "1",
+   "name": "Bacon",
+   "desc": "",
+   "price": "2.30",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [],
+    "lifestyleNames": [],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504735511",
+   "menuId": "138778",
+   "recipeId": "44012",
+   "recipeType": "Recipe",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "0",
+     "name": "Stock Exchange",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation0.png?20250917"
+    }
+   ],
+   "displayCategory": "Entrees",
+   "dailyCategory": "NONE",
+   "displayStation": "Daily Offering",
+   "card": "3",
+   "name": "Scrambled Eggs",
+   "desc": "",
+   "price": "1.50",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [
+     "E"
+    ],
+    "allergenNames": [
+     "Egg"
+    ],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Protein"
+   },
+   "hasDetails": true
+  }
+ ],
+ "Sides and Vegetables": [
+  {
+   "id": "504770415",
+   "menuId": "138778",
+   "recipeId": "51182",
+   "recipeType": "Recipe",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "15",
+     "name": "Free Style\u2122",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation15.png?20250917"
+    }
+   ],
+   "displayCategory": "Sides and Vegetables",
+   "dailyCategory": "NONE",
+   "displayStation": "Free Style\u2122",
+   "card": "1",
+   "name": "Sticky Rice",
+   "desc": "",
+   "price": "1.50",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Starch"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504770373",
+   "menuId": "138778",
+   "recipeId": "201902",
+   "recipeType": "Recipe",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "8",
+     "name": "P.S.",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation8.png?20250917"
+    }
+   ],
+   "displayCategory": "Sides and Vegetables",
+   "dailyCategory": "NONE",
+   "displayStation": "P.S.",
+   "card": "0",
+   "name": "Cinnamon Rolls",
+   "desc": "",
+   "price": "2.00",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [
+     "W",
+     "G",
+     "Mi"
+    ],
+    "allergenNames": [
+     "Wheat",
+     "Gluten",
+     "Milk"
+    ],
+    "lmAllergenCodes": [
+     "E",
+     "So",
+     "Se"
+    ],
+    "lmAllergenNames": [
+     "Egg",
+     "Soy",
+     "Sesame"
+    ],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504770382",
+   "menuId": "138778",
+   "recipeId": "204693",
+   "recipeType": "Recipe",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "8",
+     "name": "P.S.",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation8.png?20250917"
+    }
+   ],
+   "displayCategory": "Sides and Vegetables",
+   "dailyCategory": "NONE",
+   "displayStation": "P.S.",
+   "card": "1",
+   "name": "Pain au Chocolate",
+   "desc": "",
+   "price": "3.30",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [
+     "W",
+     "G",
+     "Mi",
+     "So"
+    ],
+    "allergenNames": [
+     "Wheat",
+     "Gluten",
+     "Milk",
+     "Soy"
+    ],
+    "lmAllergenCodes": [
+     "E"
+    ],
+    "lmAllergenNames": [
+     "Egg"
+    ],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  }
+ ],
+ "Desserts": [
+  {
+   "id": "504770460",
+   "menuId": "138778",
+   "recipeId": "202806",
+   "recipeType": "Recipe",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "15",
+     "name": "Free Style\u2122",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation15.png?20250917"
+    }
+   ],
+   "displayCategory": "Desserts",
+   "dailyCategory": "NONE",
+   "displayStation": "Free Style\u2122",
+   "card": "2",
+   "name": "Red Grapes Cup",
+   "desc": "",
+   "price": "4.50",
+   "dot": "Green",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Refueling/Other"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504770418",
+   "menuId": "138778",
+   "recipeId": "202801",
+   "recipeType": "Recipe",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "15",
+     "name": "Free Style\u2122",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation15.png?20250917"
+    }
+   ],
+   "displayCategory": "Desserts",
+   "dailyCategory": "NONE",
+   "displayStation": "Free Style\u2122",
+   "card": "3",
+   "name": "Pineapple Cup",
+   "desc": "",
+   "price": "4.50",
+   "dot": "Green",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Refueling/Other"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504770484",
+   "menuId": "138778",
+   "recipeId": "202808",
+   "recipeType": "Recipe",
+   "day": "2",
+   "week": "1",
+   "meal": "Breakfast",
+   "stations": [
+    {
+     "id": "15",
+     "name": "Free Style\u2122",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation15.png?20250917"
+    }
+   ],
+   "displayCategory": "Desserts",
+   "dailyCategory": "NONE",
+   "displayStation": "Free Style\u2122",
+   "card": "4",
+   "name": "Strawberry Cup",
+   "desc": "",
+   "price": "4.50",
+   "dot": "Green",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Refueling/Other"
+   },
+   "hasDetails": true
+  }
+ ],
+ "Daily": [
+  {
+   "id": "504735502",
+   "menuId": "138778",
+   "recipeId": "142823",
+   "recipeType": "complex",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "0",
+     "name": "Stock Exchange",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation0.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Breakfast",
+   "displayStation": "",
+   "card": "0",
+   "name": "Lions Mane Breakfast Platter",
+   "desc": "",
+   "price": "5.50",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [
+     "E"
+    ],
+    "allergenNames": [
+     "Egg"
+    ],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [],
+    "lifestyleNames": [],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632193",
+   "menuId": "138778",
+   "recipeId": "204133",
+   "recipeType": "BaseFood",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "4",
+     "name": "Seasonings",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation4.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Accompaniments",
+   "displayStation": "",
+   "card": "0",
+   "name": "Syrup",
+   "desc": "",
+   "price": "0.75",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Refueling/Other"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632226",
+   "menuId": "138778",
+   "recipeId": "120582",
+   "recipeType": "BaseFood",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "4",
+     "name": "Seasonings",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation4.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Accompaniments",
+   "displayStation": "",
+   "card": "6",
+   "name": "Mayonnaise",
+   "desc": "",
+   "price": "0.00",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [
+     "E"
+    ],
+    "allergenNames": [
+     "Egg"
+    ],
+    "lmAllergenCodes": [
+     "Mu"
+    ],
+    "lmAllergenNames": [
+     "Mustard"
+    ],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632223",
+   "menuId": "138778",
+   "recipeId": "71062",
+   "recipeType": "BaseFood",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "4",
+     "name": "Seasonings",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation4.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Accompaniments",
+   "displayStation": "",
+   "card": "5",
+   "name": "Mustard",
+   "desc": "",
+   "price": "0.00",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [
+     "Mu"
+    ],
+    "allergenNames": [
+     "Mustard"
+    ],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Refueling/Other"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632217",
+   "menuId": "138778",
+   "recipeId": "204377",
+   "recipeType": "BaseFood",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "4",
+     "name": "Seasonings",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation4.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Accompaniments",
+   "displayStation": "",
+   "card": "4",
+   "name": "Grape Jelly",
+   "desc": "",
+   "price": "0.00",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [
+     "Su"
+    ],
+    "lmAllergenNames": [
+     "Sulfites"
+    ],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Refueling/Other"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632211",
+   "menuId": "138778",
+   "recipeId": "71042",
+   "recipeType": "BaseFood",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "4",
+     "name": "Seasonings",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation4.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Accompaniments",
+   "displayStation": "",
+   "card": "3",
+   "name": "Ketchup",
+   "desc": "",
+   "price": "0.00",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Refueling/Other"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632205",
+   "menuId": "138778",
+   "recipeId": "85542",
+   "recipeType": "BaseFood",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "4",
+     "name": "Seasonings",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation4.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Accompaniments",
+   "displayStation": "",
+   "card": "2",
+   "name": "Hot Sauce",
+   "desc": "",
+   "price": "0.00",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Refueling/Other"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632199",
+   "menuId": "138778",
+   "recipeId": "42572",
+   "recipeType": "BaseFood",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "4",
+     "name": "Seasonings",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation4.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Accompaniments",
+   "displayStation": "",
+   "card": "1",
+   "name": "Cream Cheese",
+   "desc": "",
+   "price": "0.75",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [
+     "Mi"
+    ],
+    "allergenNames": [
+     "Milk"
+    ],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632220",
+   "menuId": "138778",
+   "recipeId": "58082",
+   "recipeType": "BaseFood",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "3",
+     "name": "The Main Ingredient\u00ae",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation3.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Beverages",
+   "displayStation": "",
+   "card": "5",
+   "name": "100% Apple Juice",
+   "desc": "",
+   "price": "2.25",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Beverages"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504735508",
+   "menuId": "138778",
+   "recipeId": "108472",
+   "recipeType": "Recipe",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "0",
+     "name": "Stock Exchange",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation0.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Breakfast",
+   "displayStation": "",
+   "card": "2",
+   "name": "Shredded Hash Browns",
+   "desc": "",
+   "price": "2.40",
+   "dot": "Green",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Starch"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632214",
+   "menuId": "138778",
+   "recipeId": "58092",
+   "recipeType": "BaseFood",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "3",
+     "name": "The Main Ingredient\u00ae",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation3.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Beverages",
+   "displayStation": "",
+   "card": "4",
+   "name": "100% Orange Juice",
+   "desc": "",
+   "price": "2.25",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Beverages"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632208",
+   "menuId": "138778",
+   "recipeId": "208739",
+   "recipeType": "Assorted",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "3",
+     "name": "The Main Ingredient\u00ae",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation3.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Beverages",
+   "displayStation": "",
+   "card": "3",
+   "name": "Assorted Tea",
+   "desc": "",
+   "price": "1.50",
+   "dot": "Green/Yellow/Red",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [
+     "G",
+     "So"
+    ],
+    "lmAllergenNames": [
+     "Gluten",
+     "Soy"
+    ],
+    "lifestyleCodes": [],
+    "lifestyleNames": [],
+    "lmLifestyleCodes": [
+     "V+"
+    ],
+    "lmLifestyleNames": [
+     "Vegan"
+    ],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632202",
+   "menuId": "138778",
+   "recipeId": "212390",
+   "recipeType": "Recipe",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "3",
+     "name": "The Main Ingredient\u00ae",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation3.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Beverages",
+   "displayStation": "",
+   "card": "2",
+   "name": "Hot Cocoa",
+   "desc": "",
+   "price": "1.50",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [
+     "Mi"
+    ],
+    "allergenNames": [
+     "Milk"
+    ],
+    "lmAllergenCodes": [
+     "So"
+    ],
+    "lmAllergenNames": [
+     "Soy"
+    ],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632196",
+   "menuId": "138778",
+   "recipeId": "200897",
+   "recipeType": "Recipe",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "3",
+     "name": "The Main Ingredient\u00ae",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation3.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Beverages",
+   "displayStation": "",
+   "card": "1",
+   "name": "Fresh-Brewed Decaf Coffee",
+   "desc": "",
+   "price": "1.50",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632187",
+   "menuId": "138778",
+   "recipeId": "44772",
+   "recipeType": "Recipe",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "3",
+     "name": "The Main Ingredient\u00ae",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation3.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Beverages",
+   "displayStation": "",
+   "card": "0",
+   "name": "Fresh-Brewed Coffee",
+   "desc": "",
+   "price": "3.25",
+   "dot": "Green",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "504741416",
+   "menuId": "138778",
+   "recipeId": "51182",
+   "recipeType": "Recipe",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "0",
+     "name": "Stock Exchange",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation0.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Breakfast",
+   "displayStation": "",
+   "card": "4",
+   "name": "Sticky Rice",
+   "desc": "",
+   "price": "1.50",
+   "dot": "Yellow",
+   "allergens": {
+    "allergenCodes": [],
+    "allergenNames": [],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V+"
+    ],
+    "lifestyleNames": [
+     "Vegan"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": "Starch"
+   },
+   "hasDetails": true
+  },
+  {
+   "id": "502632229",
+   "menuId": "138778",
+   "recipeId": "42512",
+   "recipeType": "BaseFood",
+   "day": "0",
+   "week": "99",
+   "meal": "Daily",
+   "stations": [
+    {
+     "id": "4",
+     "name": "Seasonings",
+     "image": "https://www.sagedining.com/intranet/images/structure/imgstation4.png?20250917"
+    }
+   ],
+   "displayCategory": "Daily",
+   "dailyCategory": "Accompaniments",
+   "displayStation": "",
+   "card": "7",
+   "name": "Salted Butter",
+   "desc": "",
+   "price": "0.00",
+   "dot": "Red",
+   "allergens": {
+    "allergenCodes": [
+     "Mi"
+    ],
+    "allergenNames": [
+     "Milk"
+    ],
+    "lmAllergenCodes": [],
+    "lmAllergenNames": [],
+    "lifestyleCodes": [
+     "V"
+    ],
+    "lifestyleNames": [
+     "Vegetarian"
+    ],
+    "lmLifestyleCodes": [],
+    "lmLifestyleNames": [],
+    "performanceSpotlight": ""
+   },
+   "hasDetails": true
+  }
+ ],
+ "Exclude": [],
+ "Snack": [],
+ "Events": []
+}

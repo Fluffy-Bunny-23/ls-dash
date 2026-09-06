@@ -7,13 +7,14 @@ import { useAuth } from "@/components/auth-provider";
 import { LoginWall } from "@/components/login-wall";
 import { AppHeader } from "@/components/app-header";
 import { SyncFooter } from "@/components/sync-footer";
-import { Badge, Skeleton } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useMonthDays } from "@/lib/use-days";
 import { monthWeekdayIds, weekdayOfId } from "@/lib/dates";
 import { pickCellEntree } from "@/lib/sage";
 import type { DayDoc } from "@/lib/types";
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 
 const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -55,7 +56,7 @@ function CellBody({ day }: { day: DayDoc | undefined }) {
             </p>
           )}
           {day.abc && (
-            <Badge className="mb-0.5" variant={day.isSpecial ? "gold" : "default"}>
+            <Badge className="mb-0.5" variant={day.isSpecial ? "secondary" : "default"}>
               {day.abc}
             </Badge>
           )}
@@ -186,7 +187,7 @@ function MonthInner() {
                           data-noschool={off ? "true" : "false"}
                           title={id}
                           className={cn(
-                            "min-h-20 rounded-lg border bg-white p-1.5 text-left hover:border-gold sm:min-h-24 sm:p-2",
+                            "min-h-20 rounded-lg border bg-white p-1.5 text-left hover:border-secondary sm:min-h-24 sm:p-2",
                             off
                               ? "border-red-200 bg-red-50"
                               : day?.isSpecial
