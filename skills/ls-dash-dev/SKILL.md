@@ -14,7 +14,10 @@ References: `./ref/lsdash-plan.md` (spec), `./README.md` (deploy + deviations).
 - **tmux, not background terminals.** Use socket `-S ~/tmux/sockets/agents`
   (check `ls ~/tmux/sockets/` first). Never touch the `main` socket or its
   `servers` session. Suggested session: `ls-dash` with windows `emulators`,
-  `dev`, `tests`. Poll with `capture-pane`.
+  `dev`, `tests`. Poll with `capture-pane -p -S -100` (scrollback included —
+  bare `capture-pane -p` shows only the visible grid, often blank). Fresh
+  shells init slowly here: if a capture is empty, wait 5-10s and retry;
+  `pipe-pane -o 'cat > /tmp/x'` is the fallback proof of life.
 - **Emulators only.** Never touch production Firebase, live DBs, or real
   sinunet channels. `FIRESTORE_EMULATOR_HOST` / `FIREBASE_AUTH_EMULATOR_HOST`
   must always be set when running app code, seeds, or tests.
