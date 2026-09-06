@@ -56,6 +56,22 @@ export async function fetchWeeklyMenuItems(
   return data ?? {};
 }
 
+/** Single-day call: the ONLY source of per-date `Daily` offerings (displayed
+ *  on the site as daily breakfast/beverages/accompaniments). Weekly payloads
+ *  do not carry per-day Daily items. */
+export async function fetchSingleDayMenuItems(
+  menuId: string,
+  sageDate: string,
+  meal: string,
+  fetchFn: typeof fetch = fetch,
+): Promise<SageDay | undefined> {
+  const data = (await sageFetch(
+    `/getMenuItems?menuId=${encodeURIComponent(menuId)}&date=${encodeURIComponent(sageDate)}&meal=${encodeURIComponent(meal)}&mode=`,
+    fetchFn,
+  )) as SageDay;
+  return data ?? undefined;
+}
+
 /** Closure/event labels. Only meaningful on the LUNCH menuId (breakfast returns []). */
 export async function fetchMonthlyEvents(
   menuId: string,
@@ -152,6 +168,9 @@ export function extractLunch(day: SageDay | undefined): LunchExtract {
 export interface BreakfastExtract {
   entree: string | null;
   all: string[];
+  /** `Daily`-meal items (daily platter, beverages, accompaniments). Only
+   *  present in single-day payloads; weekly day-objects have no Daily key. */
+  daily: string[];
 }
 
 export function extractBreakfast(day: SageDay | undefined): BreakfastExtract {
@@ -167,7 +186,7 @@ export function extractBreakfast(day: SageDay | undefined): BreakfastExtract {
     ...categoryNames(day, "Sides and Vegetables", meal),
     ...categoryNames(day, "Desserts", meal),
   ];
-  return { entree: entrees[0] ?? null, all };
+  return { entree: entrees[0] ?? null, all, daily: categoryNames(day, "Daily", "Daily") };
 }
 
 /** Month-cell priority (§3a): Entrées[0] → Specials[0] → Features[0]. */

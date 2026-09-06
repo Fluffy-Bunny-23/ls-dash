@@ -111,10 +111,17 @@ function TodayInner() {
           </Card>
         ) : (
           <>
-            <div className="flex flex-wrap gap-2" data-testid="day-badges">
-              {day.isNoSchool && <Badge variant="destructive">No school</Badge>}
-              {day.isSpecial && <Badge variant="secondary">Special schedule</Badge>}
-              {day.abc && !day.isNoSchool && <Badge>{day.abc} day</Badge>}
+            <div className="flex flex-wrap items-center gap-3" data-testid="day-badges">
+              {day.abc && !day.isNoSchool && (
+                <div className="flex items-center gap-2.5">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-4xl font-bold text-primary-foreground">
+                    {day.abc}
+                  </span>
+                  <span className="text-xl font-semibold text-stone-500">day</span>
+                </div>
+              )}
+              {day.isNoSchool && <Badge variant="destructive" className="text-sm">No school</Badge>}
+              {day.isSpecial && <Badge variant="secondary" className="text-sm">Special schedule</Badge>}
             </div>
             {day.specialLabel && (
               <p className="text-sm text-stone-700" data-testid="special-label">
@@ -197,6 +204,12 @@ function TodayInner() {
                         {day.breakfast.all.length > 1 && (
                           <p className="mt-1 text-sm text-stone-600">
                             {day.breakfast.all.filter((x) => x !== day.breakfast.entree).join("; ")}
+                          </p>
+                        )}
+                        {day.breakfast.daily.length > 0 && (
+                          <p className="mt-1 text-sm text-stone-600" data-testid="breakfast-daily">
+                            <span className="font-medium">Daily offerings: </span>
+                            {day.breakfast.daily.join("; ")}
                           </p>
                         )}
                       </>

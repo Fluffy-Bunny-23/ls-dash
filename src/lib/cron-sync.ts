@@ -13,6 +13,7 @@ import {
   extractBreakfast,
   extractLunch,
   fetchMonthlyEvents,
+  fetchSingleDayMenuItems,
   fetchWeeklyMenuItems,
   weekDayForId,
   type SageMonthlyEvent,
@@ -82,7 +83,11 @@ export async function runSync(deps: SyncDeps): Promise<SyncResult> {
     if (isWeekendId(id)) continue;
     const anchor = anchorForId(id);
     const lunch = extractLunch(weekDayForId(lunchWeeks.get(anchor) ?? {}, id));
-    const breakfast = extractBreakfast(weekDayForId(breakfastWeeks.get(anchor) ?? {}, id));
+    const breakfastBase = extractBreakfast(weekDayForId(breakfastWeeks.get(anchor) ?? {}, id));
+    // Daily offerings (platter, beverages, accompaniments) exist only in
+    // single-day payloads — one extra call per weekday, sequential like the rest.
+    const breakfastSingle = await fetchSingleDayMenuItems(breakfastMenuId, toSageDate(id), "Breakfast", sageFetch);
+    const breakfast = { ...breakfastBase, daily: extractBreakfast(breakfastSingle).daily };
     const occurrence = occurrences.get(id);
     lunchItemsTotal += lunch.all.length;
     if (occurrence && lunch.all.length === 0) schoolDaysWithoutLunch++;

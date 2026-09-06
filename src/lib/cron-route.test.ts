@@ -46,6 +46,18 @@ function stubFetch(opts: { icalOk?: boolean; sageEmpty?: boolean } = {}) {
       }
       return Response.json(week);
     }
+    if (url.includes("getMenuItems")) {
+      const u = new URL(url);
+      const anchor = u.searchParams.get("date") ?? "09/06/2026";
+      return Response.json({
+        Entrées: [{ meal: "Breakfast", name: `BF Entree ${anchor}` }],
+        Specials: [],
+        "Today's Menu Features": [],
+        Soups: [],
+        Sides: [],
+        Daily: [{ meal: "Daily", name: `Daily item ${anchor}` }],
+      });
+    }
     if (url.includes("getMonthlyEvents")) {
       return Response.json({});
     }
@@ -134,6 +146,7 @@ describe.skipIf(!EMU)("cron route", () => {
       expect(sample.exists).toBe(true);
       const data = sample.data() as Record<string, unknown>;
       expect((data["lunch"] as { entree: string }).entree).toContain("Lunch Entree");
+      expect((data["breakfast"] as { daily: string[] }).daily).toContain("Daily item 09/08/2026");
       expect(data["abc"]).toBe("A");
 
       // Pruned docs are gone.

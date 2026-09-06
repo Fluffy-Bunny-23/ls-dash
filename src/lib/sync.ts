@@ -37,7 +37,7 @@ export function mergeDay(input: MergedInput): DayDoc {
       sides: lunch.sides,
       all: lunch.all,
     },
-    breakfast: { entree: breakfast.entree, all: breakfast.all },
+    breakfast: { entree: breakfast.entree, all: breakfast.all, daily: breakfast.daily },
     sources: { icalUid: occurrence?.uid ?? null, sageWeek },
     updatedAt: undefined,
   };
