@@ -4,7 +4,10 @@ Personal dashboard: **Today (default) + Month toggle** showing the ABC day,
 special schedules / days off, and Sage lunch + breakfast entrées. Built per
 `ref/lsdash-plan.md`.
 
-- Stack: Next.js App Router + TypeScript + Tailwind + shadcn-style UI, Vercel.
+- Stack: Next.js App Router + TypeScript + Tailwind + shadcn UI, Vercel.
+  Brand theme: shadcn `--primary` = Lakeside maroon `#820024`, `--secondary` =
+  gold `#ECAA1F` (see `:root` in `src/app/globals.css`). Components are stock
+  `shadcn add` output (Base UI primitives); `cn` comes from `@/lib/utils`.
 - Auth: Google + Firebase, `lakesideschool.org` only. Logged-out users see a
   generic wall that reveals nothing school-specific.
 - Reads: client → Firestore directly (no `/api/*` read routes).
