@@ -193,6 +193,7 @@ try {
     b.click();
   });
   await waitForSteady(() => document.body.innerText.includes("Italian-Roasted Pork Loin"), 20000);
+  await waitForSteady(() => document.title === "LS Dash", 4, 10000);
   const title = await cdp.eval(() => document.title);
   check("authed document title", title === "LS Dash", title);
   const entree = await cdp.eval(() => document.querySelector('[data-testid="lunch-entree"]')?.textContent);
