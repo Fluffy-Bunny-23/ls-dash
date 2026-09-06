@@ -13,6 +13,7 @@ export interface LunchInfo {
 export interface BreakfastInfo {
   entree: string | null;
   all: string[];
+  daily: string[];
 }
 
 export interface DayDoc {

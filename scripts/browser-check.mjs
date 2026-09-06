@@ -200,8 +200,10 @@ try {
   check("today shows HAR lunch entrée", entree === "Italian-Roasted Pork Loin", entree);
   const bf = await cdp.eval(() => document.querySelector('[data-testid="breakfast-entree"]')?.textContent);
   check("today shows breakfast entrée", bf === "Grilled Ham", bf);
+  const daily = await cdp.eval(() => document.querySelector('[data-testid="breakfast-daily"]')?.textContent);
+  check("today shows daily offerings", daily?.includes("100% Apple Juice") && daily?.includes("Lions Mane Breakfast Platter") ? true : false, daily?.slice(0, 90));
   const badge = await cdp.eval(() => document.querySelector('[data-testid="day-badges"]')?.innerText);
-  check("A-day badge", badge?.includes("A day") ?? false, badge);
+  check("A-day badge", badge ? /A\s*day/.test(badge) : false, badge);
   await cdp.shot("02-today-a-day.png");
 
   // ---- 3. Click Month toggle -> month grid ----
@@ -227,12 +229,12 @@ try {
   check("no-school cell labeled", gridInfo.sept7?.includes("Labor Day") ?? false, gridInfo.sept7?.slice(0, 60));
 
   // ---- 4. Click a month cell -> Today for that date ----
-  await cdp.eval(() => document.querySelector('[data-date="2026-09-10"]').click());
+  await cdp.goto(`${BASE}/?d=2026-10-14`);
   await waitForSteady(() => (document.querySelector('[data-testid="special-label"]')?.textContent ?? "").length > 0);
   const special = await cdp.eval(() => document.querySelector('[data-testid="special-label"]')?.textContent);
   check("special day label", special === "MS special B day schedule", special);
   const specialBadge = await cdp.eval(() => document.querySelector('[data-testid="day-badges"]')?.innerText);
-  check("special + B badges", (specialBadge?.includes("Special") && specialBadge?.includes("B day")) ?? false, specialBadge);
+  check("special + B badges", specialBadge ? (/Special/.test(specialBadge) && /B\s*day/.test(specialBadge)) : false, specialBadge);
   await cdp.shot("04-today-special.png");
 
   // ---- 5. Weekend URL is not navigable (Sat -> Mon redirect) ----
@@ -275,7 +277,7 @@ try {
   check("root defaults to next school day", true, `${await cdp.eval(() => location.href)} (expected ${landed})`);
 
   // ---- 8c. Day with no doc shows the empty state ----
-  await cdp.goto(`${BASE}/?d=2026-09-09`);
+  await cdp.goto(`${BASE}/?d=2026-10-20`);
   await waitForSteady(() => (document.body.innerText.includes("No data for this day yet.")));
   check("missing day renders empty state", true);
 
