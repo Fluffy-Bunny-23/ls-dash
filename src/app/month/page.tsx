@@ -43,7 +43,7 @@ function CellBody({ day }: { day: DayDoc | undefined }) {
   const lunchEntree = pickCellEntree(day.lunch);
   return (
     <div className="min-w-0">
-      {/* Priority: 1) day off / special, 2) ABC, 3) lunch, 4) breakfast */}
+      {/* Priority: 1) day off / special, 2) ABC (top-right corner), 3) lunch, 4) breakfast */}
       {day.isNoSchool ? (
         <p className="truncate text-xs font-semibold text-red-800" title={day.noSchoolLabel ?? "No school"}>
           {day.noSchoolLabel ?? "No school"}
@@ -54,11 +54,6 @@ function CellBody({ day }: { day: DayDoc | undefined }) {
             <p className="truncate text-xs font-semibold text-amber-800" title={day.specialLabel ?? "Special schedule"}>
               {day.specialLabel ?? "Special schedule"}
             </p>
-          )}
-          {day.abc && (
-            <Badge className="mb-0.5" variant={day.isSpecial ? "secondary" : "default"}>
-              {day.abc}
-            </Badge>
           )}
           {lunchEntree ? (
             <p className="truncate text-xs text-stone-700" title={lunchEntree}>
@@ -195,9 +190,16 @@ function MonthInner() {
                                 : "border-stone-200",
                           )}
                         >
-                          <p className="text-xs font-semibold text-stone-500">
-                            {Number(id.slice(8, 10))}
-                          </p>
+                          <div className="flex items-start justify-between gap-1">
+                            <p className="text-xs font-semibold text-stone-500">
+                              {Number(id.slice(8, 10))}
+                            </p>
+                            {day?.abc && !off && (
+                              <Badge variant={day.isSpecial ? "secondary" : "default"}>
+                                {day.abc}
+                              </Badge>
+                            )}
+                          </div>
                           <CellBody day={day} />
                         </Link>
                       );
