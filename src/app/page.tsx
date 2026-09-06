@@ -206,10 +206,10 @@ function TodayInner() {
                             {day.breakfast.all.filter((x) => x !== day.breakfast.entree).join("; ")}
                           </p>
                         )}
-                        {day.breakfast.daily.length > 0 && (
+                        {(day.breakfast.daily ?? []).length > 0 && (
                           <p className="mt-1 text-sm text-stone-600" data-testid="breakfast-daily">
                             <span className="font-medium">Daily offerings: </span>
-                            {day.breakfast.daily.join("; ")}
+                            {(day.breakfast.daily ?? []).join("; ")}
                           </p>
                         )}
                       </>

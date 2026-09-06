@@ -7,7 +7,8 @@ special schedules / days off, and Sage lunch + breakfast entrées. Built per
 - Stack: Next.js App Router + TypeScript + Tailwind + shadcn UI, Vercel.
   Brand theme: shadcn `--primary` = Example maroon `#820024`, `--secondary` =
   gold `#ECAA1F` (see `:root` in `src/app/globals.css`). Components are stock
-  `shadcn add` output (Base UI primitives); `cn` comes from `@/lib/utils`.
+  `shadcn add` output (Base UI primitives); `cn` comes from `@/lib/utils`
+  (a re-export of the `cn` package, which generated `ui/*` files import directly).
 - Food completeness: lunch captures all 8 API categories; breakfast captures
   the same categories (meal-filtered) PLUS per-date `Daily` offerings (daily
   platter, beverages, accompaniments) via one extra single-day `getMenuItems`

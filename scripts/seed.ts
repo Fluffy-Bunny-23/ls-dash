@@ -32,7 +32,11 @@ loadEnv(join(process.cwd(), ".env.local"));
 admin.initializeApp({ projectId: process.env.FIREBASE_PROJECT_ID ?? "demo-school-dash" });
 const db = admin.firestore();
 
-// Live single-day `Daily` offerings (meal=Daily) per date.
+// `Daily`-meal offerings (daily platter, beverages, accompaniments) — the
+// category only appears in single-day `getMenuItems` payloads (see
+// `src/lib/__fixtures__/sage-single-0908-breakfast.json`). DAILY_0908 is
+// captured from that 09-08 payload; 09-09/09-10 reuse it and DAILY_0911 is
+// the Friday set from the same live probe. Re-capture if Sage rotates items.
 const DAILY_0908 = [
   "Lions Mane Breakfast Platter", "Syrup", "Mayonnaise", "Mustard",
   "Grape Jelly", "Ketchup", "Hot Sauce", "Cream Cheese", "100% Apple Juice",

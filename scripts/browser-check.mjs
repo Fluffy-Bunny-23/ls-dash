@@ -229,7 +229,11 @@ try {
   check("no-school cell labeled", gridInfo.sept7?.includes("Labor Day") ?? false, gridInfo.sept7?.slice(0, 60));
 
   // ---- 4. Click a month cell -> Today for that date ----
-  await cdp.goto(`${BASE}/?d=2026-10-14`);
+  // The only seeded special day is 10-14, so page the month grid to October
+  // first — then click the cell, keeping month-click navigation coverage.
+  await cdp.goto(`${BASE}/month?m=2026-10`);
+  await waitForSteady(() => document.querySelector('[data-date="2026-10-14"]'));
+  await cdp.eval(() => document.querySelector('[data-date="2026-10-14"]').click());
   await waitForSteady(() => (document.querySelector('[data-testid="special-label"]')?.textContent ?? "").length > 0);
   const special = await cdp.eval(() => document.querySelector('[data-testid="special-label"]')?.textContent);
   check("special day label", special === "MS special B day schedule", special);
