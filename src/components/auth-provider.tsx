@@ -49,18 +49,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    // Hint the hosted domain; rules enforce it regardless.
     provider.setCustomParameters({ hd: schoolDomain() });
     const auth = getFirebaseAuth();
+    // Prefer popup, fallback to redirect for strict blockers (user's env blocks popup even on click).
     try {
       await signInWithPopup(auth, provider);
     } catch (e: unknown) {
       const code = (e as { code?: string })?.code;
-      if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
-        await signInWithRedirect(auth, provider);
-        return;
-      }
-      throw e;
+      console.warn("popup failed, falling back to redirect", code, e);
+      await signInWithRedirect(auth, provider);
     }
   };
 
