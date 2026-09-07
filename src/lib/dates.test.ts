@@ -60,10 +60,10 @@ describe("retention window", () => {
 });
 
 describe("sage anchors", () => {
-  it("covers the window with Sunday anchors", () => {
+  it("covers the window with Monday anchors (Sunday buggy)", () => {
     const anchors = weekAnchorsForWindow("2026-08-12", "2026-10-11");
-    expect(anchors[0]).toBe("08/09/2026"); // Sunday on/before start
-    expect(anchors[anchors.length - 1]).toBe("10/11/2026"); // Sunday end
+    expect(anchors[0]).toBe("08/10/2026"); // Monday anchor (Sage returns previous week on Sunday)
+    expect(anchors[anchors.length - 1]).toBe("10/12/2026"); // Monday after Sunday end
     expect(anchors.length).toBe(10); // ~9 per the plan; exact count depends on alignment
     expect(toSageDate("2026-09-11")).toBe("09/11/2026");
   });

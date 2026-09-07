@@ -1,12 +1,11 @@
 import admin from "firebase-admin";
 import {
-  addDaysId,
   isWeekendId,
+  mondayAnchorForId,
   rangeIds,
   retentionWindow,
   toSageDate,
   weekAnchorsForWindow,
-  weekdayOfId,
 } from "@/lib/dates";
 import { expandOccurrences, parseIcalEvents } from "@/lib/ical";
 import {
@@ -38,11 +37,9 @@ export interface SyncResult {
   warnings: string[];
 }
 
-/** Sunday (MM/DD/YYYY anchor) on/before a date id. */
+/** Monday anchor matching weekAnchorsForWindow — avoids Sage Sunday bug. */
 function anchorForId(dateId: string): string {
-  let cur = dateId;
-  while (weekdayOfId(cur) !== 0) cur = addDaysId(cur, -1);
-  return toSageDate(cur);
+  return toSageDate(mondayAnchorForId(dateId));
 }
 
 export async function runSync(deps: SyncDeps): Promise<SyncResult> {

@@ -113,16 +113,25 @@ export function toSageDate(id: string): string {
   return `${String(m).padStart(2, "0")}/${String(d).padStart(2, "0")}/${y}`;
 }
 
+/** Monday anchor for a dateId — Sage weekly API returns the previous week when queried on a Sunday, so anchors must be Mon–Sat. */
+export function mondayAnchorForId(id: string): string {
+  const w = weekdayOfId(id);
+  if (w === 0) return addDaysId(id, 1); // Sunday -> next Monday
+  if (w === 1) return id;
+  return addDaysId(id, -(w - 1));
+}
+
 /**
- * Sunday-start week anchors (Sun–Sat, matching Sage weekly keys) covering
- * [startId, endId]. One anchor per week => ~9 calls for a ±30d window.
+ * Monday-based week anchors covering [startId, endId]. Sage weekly API is
+ * buggy on Sundays (returns previous week), so we anchor on Mondays (Sun–Sat
+ * keys still returned, but fetch is done via Monday). ~9 calls for ±30d.
  */
 export function weekAnchorsForWindow(startId: string, endId: string): string[] {
-  // Back up to the Sunday on/before startId.
-  let cur = startId;
-  while (weekdayOfId(cur) !== 0) cur = addDaysId(cur, -1);
+  const startMon = mondayAnchorForId(startId);
+  const endMon = mondayAnchorForId(endId);
   const anchors: string[] = [];
-  while (cur <= endId) {
+  let cur = startMon;
+  while (cur <= endMon) {
     anchors.push(toSageDate(cur));
     cur = addDaysId(cur, 7);
   }
