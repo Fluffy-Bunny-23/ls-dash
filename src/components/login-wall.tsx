@@ -48,6 +48,7 @@ export function LoginWall() {
           </Button>
         )}
         {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
+        <p className="mt-3 text-xs text-stone-400">If sign-in loops back here, check popup blocker or try Incognito. After Google redirect, URL should contain firebase auth code - if you see &quot;No access&quot; next, note the email shown there.</p>
       </div>
     </main>
   );
