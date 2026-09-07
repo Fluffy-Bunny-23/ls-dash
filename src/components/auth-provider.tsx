@@ -2,10 +2,12 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import {
+  getRedirectResult,
   GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
   signOut,
   type User,
 } from "firebase/auth";
@@ -36,6 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const emulatorMode = usingEmulators();
 
   useEffect(() => {
+    // Handle redirect flow result (fallback for popup-blocked browsers).
+    getRedirectResult(getFirebaseAuth()).catch(() => {});
     const unsub = onAuthStateChanged(getFirebaseAuth(), (u) => {
       setUser(u);
       setLoading(false);
@@ -47,7 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const provider = new GoogleAuthProvider();
     // Hint the hosted domain; rules enforce it regardless.
     provider.setCustomParameters({ hd: schoolDomain() });
-    await signInWithPopup(getFirebaseAuth(), provider);
+    const auth = getFirebaseAuth();
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (e: unknown) {
+      const code = (e as { code?: string })?.code;
+      if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+        await signInWithRedirect(auth, provider);
+        return;
+      }
+      throw e;
+    }
   };
 
   const devSignIn = async () => {
