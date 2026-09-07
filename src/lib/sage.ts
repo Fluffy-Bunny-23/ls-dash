@@ -122,9 +122,12 @@ function toDetail(it: SageItem, category: string): MenuItemDetail | null {
   const station = normalizeName(String((it as Record<string, unknown>).displayStation ?? ""));
   const price = normalizePrice((it as Record<string, unknown>).price);
   const dot = normalizeName(String((it as Record<string, unknown>).dot ?? ""));
-  const desc = typeof (it as Record<string, unknown>).desc === "string" ? normalizeName(String((it as Record<string, unknown>).desc)) : undefined;
+  const rawDesc = (it as Record<string, unknown>).desc;
+  const desc = typeof rawDesc === "string" ? normalizeName(String(rawDesc)) : "";
   const { allergens, maybeAllergens, lifestyle } = extractAllergens((it as Record<string, unknown>).allergens);
-  return { name, category, station, price, dot, allergens, maybeAllergens, lifestyle, desc: desc || undefined };
+  const detail: MenuItemDetail = { name, category, station, price, dot, allergens, maybeAllergens, lifestyle };
+  if (desc) detail.desc = desc;
+  return detail;
 }
 
 export function categoryDetails(day: SageDay | undefined, category: string, meal: string): MenuItemDetail[] {
