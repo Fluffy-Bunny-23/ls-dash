@@ -38,9 +38,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const emulatorMode = usingEmulators();
 
   useEffect(() => {
-    // Handle redirect flow result (fallback for popup-blocked browsers).
-    getRedirectResult(getFirebaseAuth()).catch(() => {});
-    const unsub = onAuthStateChanged(getFirebaseAuth(), (u) => {
+    const auth = getFirebaseAuth();
+    getRedirectResult(auth)
+      .then((r) => {
+        if (r?.user) console.log("getRedirectResult user", r.user.email, r.user.uid);
+        else console.log("getRedirectResult no user", r);
+      })
+      .catch((e) => console.error("getRedirectResult failed", (e as { code?: string })?.code, (e as Error)?.message, e));
+    const unsub = onAuthStateChanged(auth, (u) => {
+      console.log("onAuthStateChanged", u?.email ?? "null", "verified", u?.emailVerified);
       setUser(u);
       setLoading(false);
     });
