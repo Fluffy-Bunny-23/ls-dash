@@ -34,6 +34,33 @@ export function LoginWall() {
     }
   };
 
+  const doGoogleRedirect = async () => {
+    setError(null);
+    try {
+      const { GoogleAuthProvider, signInWithRedirect } = await import("firebase/auth");
+      const { getFirebaseAuth } = await import("@/lib/firebase-client");
+      const { schoolDomain } = await import("@/lib/config");
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ hd: schoolDomain() });
+      await signInWithRedirect(getFirebaseAuth(), provider);
+    } catch (e: unknown) {
+      const err = e as { code?: string; message?: string };
+      setError(`Redirect failed: ${err?.code ?? "unknown"} ${err?.message ?? String(e)}`);
+    }
+  };
+
+  const doDebugEmail = async () => {
+    setError(null);
+    try {
+      const { signInWithEmailAndPassword } = await import("firebase/auth");
+      const { getFirebaseAuth } = await import("@/lib/firebase-client");
+      await signInWithEmailAndPassword(getFirebaseAuth(), "debug-test@lakesideschool.org", "TempPass123!");
+    } catch (e: unknown) {
+      const err = e as { code?: string; message?: string };
+      setError(`Email login failed: ${err?.code ?? "unknown"} ${err?.message ?? String(e)}`);
+    }
+  };
+
   return (
     <main className="flex min-h-dvh items-center justify-center bg-stone-100 p-4">
       <div className="w-full max-w-sm rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
@@ -41,6 +68,12 @@ export function LoginWall() {
         <p className="mt-1 text-sm text-stone-500">Sign in with your account to proceed.</p>
         <Button variant="outline" className="mt-4 w-full" onClick={doGoogle}>
           Continue with Google
+        </Button>
+        <Button variant="ghost" className="mt-2 w-full text-xs" onClick={doGoogleRedirect}>
+          Try Google (redirect)
+        </Button>
+        <Button variant="ghost" className="mt-1 w-full text-xs text-stone-500" onClick={doDebugEmail}>
+          Debug email login (test)
         </Button>
         {emulatorMode && (
           <Button variant="outline" className="mt-2 w-full" onClick={doDev}>
