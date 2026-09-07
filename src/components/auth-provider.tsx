@@ -55,9 +55,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ hd: schoolDomain() });
+    // hd hint is optional; removing to isolate redirect null issue - rules still enforce domain.
+    // provider.setCustomParameters({ hd: schoolDomain() });
     const auth = getFirebaseAuth();
-    // Prefer popup, fallback to redirect for strict blockers (user's env blocks popup even on click).
     try {
       await signInWithPopup(auth, provider);
     } catch (e: unknown) {
