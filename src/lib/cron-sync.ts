@@ -82,6 +82,7 @@ export async function runSync(deps: SyncDeps): Promise<SyncResult> {
   // per date so one miss never aborts the sync.
   const weekdayIds = rangeIds(startId, endId).filter((id) => !isWeekendId(id));
   const dailyById = new Map<string, string[]>();
+  const dailyDetailsById = new Map<string, import("./types").MenuItemDetail[]>();
   {
     let cursor = 0;
     const workers = Array.from({ length: 5 }, async () => {
@@ -89,7 +90,9 @@ export async function runSync(deps: SyncDeps): Promise<SyncResult> {
         const id = weekdayIds[cursor++];
         try {
           const single = await fetchSingleDayMenuItems(breakfastMenuId, toSageDate(id), "Breakfast", sageFetch);
-          dailyById.set(id, extractBreakfast(single).daily);
+          const ex = extractBreakfast(single);
+          dailyById.set(id, ex.daily);
+          dailyDetailsById.set(id, ex.dailyDetails);
         } catch (e) {
           warnings.push(`daily offerings missing for ${id}: ${(e as Error)?.message ?? e}`);
         }
@@ -108,7 +111,7 @@ export async function runSync(deps: SyncDeps): Promise<SyncResult> {
     const anchor = anchorForId(id);
     const lunch = extractLunch(weekDayForId(lunchWeeks.get(anchor) ?? {}, id));
     const breakfastBase = extractBreakfast(weekDayForId(breakfastWeeks.get(anchor) ?? {}, id));
-    const breakfast = { ...breakfastBase, daily: dailyById.get(id) ?? [] };
+    const breakfast = { ...breakfastBase, daily: dailyById.get(id) ?? [], dailyDetails: dailyDetailsById.get(id) ?? [] };
     const occurrence = occurrences.get(id);
     lunchItemsTotal += lunch.all.length;
     if (occurrence && lunch.all.length === 0) schoolDaysWithoutLunch++;

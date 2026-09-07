@@ -9,6 +9,7 @@
  * filter — verified against ref/Sage-breakfast.har).
  */
 import { toSageDate } from "./dates";
+import type { MenuItemDetail } from "./types";
 
 export const SAGE_BASE = "https://www.sagedining.com/microsites";
 const UA =
@@ -99,6 +100,79 @@ export function normalizeName(s: string): string {
 /** Categories that never hold entrées (condiments/dressings/milk, internals). */
 const SKIP_CATEGORIES = new Set(["Exclude", "Snack", "Events", "Daily"]);
 
+function normalizePrice(v: unknown): string {
+  if (v === null || v === undefined) return "0";
+  const s = String(v).trim();
+  if (!s || s === "0" || s === "0.00") return "0";
+  return s;
+}
+
+function extractAllergens(allergens: unknown): Pick<MenuItemDetail, "allergens" | "maybeAllergens" | "lifestyle"> {
+  if (!allergens || typeof allergens !== "object") return { allergens: [], maybeAllergens: [], lifestyle: [] };
+  const a = allergens as Record<string, unknown>;
+  const allergenNames = Array.isArray(a.allergenNames) ? (a.allergenNames as string[]).filter(Boolean) : [];
+  const maybeAllergenNames = Array.isArray(a.lmAllergenNames) ? (a.lmAllergenNames as string[]).filter(Boolean) : [];
+  const lifestyleNames = Array.isArray(a.lifestyleNames) ? (a.lifestyleNames as string[]).filter(Boolean) : [];
+  return { allergens: allergenNames, maybeAllergens: maybeAllergenNames, lifestyle: lifestyleNames };
+}
+
+function toDetail(it: SageItem, category: string): MenuItemDetail | null {
+  const name = normalizeName(String(it?.name ?? ""));
+  if (!name) return null;
+  const station = normalizeName(String((it as Record<string, unknown>).displayStation ?? ""));
+  const price = normalizePrice((it as Record<string, unknown>).price);
+  const dot = normalizeName(String((it as Record<string, unknown>).dot ?? ""));
+  const desc = typeof (it as Record<string, unknown>).desc === "string" ? normalizeName(String((it as Record<string, unknown>).desc)) : undefined;
+  const { allergens, maybeAllergens, lifestyle } = extractAllergens((it as Record<string, unknown>).allergens);
+  return { name, category, station, price, dot, allergens, maybeAllergens, lifestyle, desc: desc || undefined };
+}
+
+export function categoryDetails(day: SageDay | undefined, category: string, meal: string): MenuItemDetail[] {
+  if (!day) return [];
+  const items = day[category];
+  if (!Array.isArray(items)) return [];
+  const out: MenuItemDetail[] = [];
+  for (const it of items) {
+    if (it?.meal !== meal) continue;
+    const d = toDetail(it, category);
+    if (d) out.push(d);
+  }
+  return out;
+}
+
+function allDetails(day: SageDay | undefined, meal: string, includeDaily: boolean): MenuItemDetail[] {
+  if (!day) return [];
+  const cats = ["Entrées", "Specials", "Today's Menu Features", "Soups", "Salads", "Deli", "Sides and Vegetables", "Desserts"];
+  const out: MenuItemDetail[] = [];
+  for (const cat of cats) out.push(...categoryDetails(day, cat, meal));
+  // extra unknown categories
+  for (const [cat, items] of Object.entries(day)) {
+    if (SKIP_CATEGORIES.has(cat) || cats.includes(cat)) continue;
+    if (!Array.isArray(items)) continue;
+    for (const it of items) {
+      if (it?.meal !== meal) continue;
+      const d = toDetail(it, cat);
+      if (d) out.push(d);
+    }
+  }
+  if (includeDaily) {
+    // Daily-meal items live under "Daily" category with meal === "Daily"
+    const dailyCats = Object.keys(day);
+    for (const cat of dailyCats) {
+      if (!Array.isArray(day[cat])) continue;
+      for (const it of day[cat] as SageItem[]) {
+        if (it?.meal !== "Daily") continue;
+        // Only include if this is truly a Daily item (category === "Daily")
+        // The generic loop above skipped SKIP_CATEGORIES, so handle Daily separately
+        if (cat !== "Daily") continue;
+        const d = toDetail(it, "Daily");
+        if (d) out.push(d);
+      }
+    }
+  }
+  return out;
+}
+
 /**
  * Names in a category restricted to one served meal, whitespace-normalized.
  * `daily` payloads and `Daily`-meal condiments are skipped by the caller
@@ -124,6 +198,7 @@ export interface LunchExtract {
   soups: string[];
   sides: string[];
   all: string[];
+  details: MenuItemDetail[];
 }
 
 export function extractLunch(day: SageDay | undefined): LunchExtract {
@@ -155,6 +230,7 @@ export function extractLunch(day: SageDay | undefined): LunchExtract {
     }
   }
   const all = [...entrees, ...specials, ...features, ...soups, ...salads, ...deli, ...sides, ...desserts, ...extra];
+  const details = allDetails(day, meal, false);
   return {
     entree: entrees[0] ?? null,
     special: specials[0] ?? null,
@@ -162,6 +238,7 @@ export function extractLunch(day: SageDay | undefined): LunchExtract {
     soups,
     sides,
     all,
+    details,
   };
 }
 
@@ -171,6 +248,8 @@ export interface BreakfastExtract {
   /** `Daily`-meal items (daily platter, beverages, accompaniments). Only
    *  present in single-day payloads; weekly day-objects have no Daily key. */
   daily: string[];
+  details: MenuItemDetail[];
+  dailyDetails: MenuItemDetail[];
 }
 
 export function extractBreakfast(day: SageDay | undefined): BreakfastExtract {
@@ -186,11 +265,14 @@ export function extractBreakfast(day: SageDay | undefined): BreakfastExtract {
     ...categoryNames(day, "Sides and Vegetables", meal),
     ...categoryNames(day, "Desserts", meal),
   ];
-  return { entree: entrees[0] ?? null, all, daily: categoryNames(day, "Daily", "Daily") };
+  const details = allDetails(day, meal, false);
+  const daily = categoryNames(day, "Daily", "Daily");
+  const dailyDetails = categoryDetails(day, "Daily", "Daily");
+  return { entree: entrees[0] ?? null, all, daily, details, dailyDetails };
 }
 
 /** Month-cell priority (§3a): Entrées[0] → Specials[0] → Features[0]. */
-export function pickCellEntree(lunch: LunchExtract): string | null {
+export function pickCellEntree(lunch: Pick<LunchExtract, "entree" | "special" | "feature">): string | null {
   return lunch.entree ?? lunch.special ?? lunch.feature;
 }
 

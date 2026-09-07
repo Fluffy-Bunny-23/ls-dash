@@ -1,5 +1,17 @@
 export type AbcDay = "A" | "B" | "C";
 
+export interface MenuItemDetail {
+  name: string;
+  category: string; // Sage displayCategory, e.g. "Entrées", "Specials", "Sides and Vegetables"
+  station: string; // displayStation, e.g. "Free Style™" — may be "" for Daily staples
+  price: string; // normalized string, "0" | "0.00" means not priced / included
+  dot: string; // "Green" | "Yellow" | "Red" | "Green/Yellow/Red" | "Not Serving"
+  allergens: string[]; // allergenNames (contains)
+  maybeAllergens: string[]; // lmAllergenNames (may contain / cross-contact)
+  lifestyle: string[]; // lifestyleNames (Vegetarian, Vegan, etc.)
+  desc?: string;
+}
+
 export interface LunchInfo {
   entree: string | null;
   special: string | null;
@@ -8,6 +20,9 @@ export interface LunchInfo {
   sides: string[];
   /** Every entrée-relevant item name (entrées, specials, features, soups, salads, deli, sides, desserts). */
   all: string[];
+  /** Detailed items with price/station/allergens. Optional for back-compat. */
+  details?: MenuItemDetail[];
+  /** Daily not used for lunch but kept for symmetry. */
 }
 
 export interface BreakfastInfo {
@@ -15,6 +30,8 @@ export interface BreakfastInfo {
   all: string[];
   /** Daily-meal offerings. Absent on docs written before the field existed — readers must default to []. */
   daily?: string[];
+  details?: MenuItemDetail[];
+  dailyDetails?: MenuItemDetail[];
 }
 
 export interface DayDoc {
