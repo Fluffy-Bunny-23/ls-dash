@@ -20,6 +20,7 @@ import {
   todayPtId,
 } from "@/lib/dates";
 import type { MenuItemDetail } from "@/lib/types";
+import { schoolDomain } from "@/lib/config";
 
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -342,6 +343,9 @@ function TodayInner() {
           <h1 className="text-lg font-semibold">No access</h1>
           <p className="mt-1 text-sm text-stone-500">
             This account doesn&apos;t have access. Please use an authorized account.
+          </p>
+          <p className="mt-2 break-all text-xs text-stone-400">
+            signed in as {user.email ?? "unknown"} · expecting @{schoolDomain()} · verified={String(user.emailVerified)}
           </p>
           <Button className="mt-4 w-full" variant="outline" onClick={() => void signOutAll()}>
             Sign out
