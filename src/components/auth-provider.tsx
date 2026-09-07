@@ -38,15 +38,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const emulatorMode = usingEmulators();
 
   useEffect(() => {
-    const auth = getFirebaseAuth();
-    getRedirectResult(auth)
-      .then((r) => {
-        if (r?.user) console.log("getRedirectResult user", r.user.email, r.user.uid);
-        else console.log("getRedirectResult no user", r);
-      })
-      .catch((e) => console.error("getRedirectResult failed", (e as { code?: string })?.code, (e as Error)?.message, e));
-    const unsub = onAuthStateChanged(auth, (u) => {
-      console.log("onAuthStateChanged", u?.email ?? "null", "verified", u?.emailVerified);
+    // Handle redirect flow result (fallback for popup-blocked browsers).
+    getRedirectResult(getFirebaseAuth()).catch(() => {});
+    const unsub = onAuthStateChanged(getFirebaseAuth(), (u) => {
       setUser(u);
       setLoading(false);
     });
@@ -55,15 +49,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    // hd hint is optional; removing to isolate redirect null issue - rules still enforce domain.
-    // provider.setCustomParameters({ hd: schoolDomain() });
+    // Hint the hosted domain; rules enforce it regardless.
+    provider.setCustomParameters({ hd: schoolDomain() });
     const auth = getFirebaseAuth();
     try {
       await signInWithPopup(auth, provider);
     } catch (e: unknown) {
       const code = (e as { code?: string })?.code;
-      console.warn("popup failed, falling back to redirect", code, e);
-      await signInWithRedirect(auth, provider);
+      if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" || code === "auth/cancelled-popup-request") {
+        await signInWithRedirect(auth, provider);
+        return;
+      }
+      throw e;
     }
   };
 
