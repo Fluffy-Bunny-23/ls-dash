@@ -16,8 +16,10 @@ export function LoginWall() {
     setError(null);
     try {
       await signInGoogle();
-    } catch {
-      setError("Sign-in failed. Please try again.");
+    } catch (e: unknown) {
+      const err = e as { code?: string; message?: string };
+      setError(`Sign-in failed: ${err?.code ?? "unknown"} ${err?.message ?? String(e)}`);
+      console.error("signInGoogle failed", e);
     }
   };
 
@@ -25,8 +27,10 @@ export function LoginWall() {
     setError(null);
     try {
       await devSignIn();
-    } catch {
-      setError("Sign-in failed. Please try again.");
+    } catch (e: unknown) {
+      const err = e as { code?: string; message?: string };
+      setError(`Sign-in failed: ${err?.code ?? "unknown"} ${err?.message ?? String(e)}`);
+      console.error("devSignIn failed", e);
     }
   };
 
