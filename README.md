@@ -94,8 +94,35 @@ never hits the network; the seed uses entrée names from `ref/Sage*.har`.
    `SAGE_BREAKFAST_MENU_ID=138778`. Do **not** set the `*_EMULATOR_HOST` vars.
 3. `vercel.json` already schedules `GET /api/cron/sync` at `0 12 * * *`.
    Vercel sends `Authorization: Bearer <CRON_SECRET>`; anything else gets 401.
-4. Without emulator env vars, `/api/dev/token` returns 404 and the Dev
-   sign-in button is hidden — Google (hosted domain hint) is the only path.
+ 4. Without emulator env vars, `/api/dev/token` returns 404 and the Dev
+    sign-in button is hidden — Google (hosted domain hint) is the only path.
+
+## Google sign-in in privacy-hardened browsers (Helium, LibreWolf, …)
+
+Popup is the primary flow and works even when the browser partitions
+third-party storage. Redirect is offered as an explicit fallback button —
+the app never silently swaps to it (that swap was the old silent-login-loop).
+
+- Helium blocks popups and third-party cookies by default. For **popup**:
+  allow popups for the site. For **redirect**: allow third-party cookies and
+  on-device site data for `accounts.google.com`, `google.com`, the
+  `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` host, and the app domain.
+- Redirect failures are now surfaced on the login wall (previously
+  `getRedirectResult()` errors were swallowed, i.e. the silent loop).
+- Optional hardening if redirect must survive third-party-cookie blocking
+  (Firebase "Option 3", same-origin helper):
+  1. Deploy with the `/__/auth/*` rewrite in `next.config.ts` (already in
+     the repo — it proxies to `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`).
+  2. Set `NEXT_PUBLIC_FIREBASE_SELF_HOST_AUTH_HELPER=true` on the
+     deployment so `authDomain` becomes the app's own host.
+  3. Firebase console → Authentication → Settings → Authorized domains: add
+     the app domain.
+  4. Google Cloud console → APIs & Services → Credentials → OAuth 2.0
+     Client for the Firebase project: add
+     `https://<app-domain>/__/auth/handler` as an authorized redirect URI
+     (and the corresponding ACS/authorized-JS-origin entry for the domain).
+  5. Redeploy, then verify redirect in Helium with third-party cookies
+     still blocked.
 
 ## Notes / deviations from `ref/lsdash-plan.md`
 
