@@ -33,6 +33,9 @@ interface AuthState {
 
 const AuthCtx = createContext<AuthState | null>(null);
 
+/** sessionStorage marker so a storage-partitioned redirect return (null, no error) is loud, not a loop. */
+const REDIRECT_PENDING_KEY = "lsdash-redirect-pending-since";
+
 export function useAuth(): AuthState {
   const v = useContext(AuthCtx);
   if (!v) throw new Error("useAuth outside provider");
@@ -50,9 +53,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Resolve the redirect flow exactly once. Errors used to be swallowed
     // here (`.catch(() => {})`), which turned every redirect failure in
     // partitioned-storage browsers (Helium, etc.) into a silent login loop.
+    // Note getRedirectResult() can also resolve with null WITHOUT an error
+    // when the browser partitions third-party storage: the helper can't read
+    // its state after the round-trip. Detect that via a sessionStorage marker
+    // set before signInWithRedirect() so it shows as an error, not a loop.
     getRedirectResult(getFirebaseAuth())
+      .then((result) => {
+        if (result) {
+          sessionStorage.removeItem(REDIRECT_PENDING_KEY);
+          return;
+        }
+        let pendingSince: string | null = null;
+        try {
+          pendingSince = sessionStorage.getItem(REDIRECT_PENDING_KEY);
+        } catch {
+          pendingSince = null;
+        }
+        if (pendingSince) {
+          sessionStorage.removeItem(REDIRECT_PENDING_KEY);
+          // Stale markers (older than 15 min, e.g. abandoned attempt in the
+          // same tab session) are ignored to avoid a bogus error on next visit.
+          if (Date.now() - Number(pendingSince) < 15 * 60 * 1000) {
+            setRedirectError(
+              "Redirect sign-in returned without a session (no error reported). " +
+                "The browser blocked the sign-in helper's third-party storage. " +
+                "Use the popup flow with popups allowed, or allow third-party " +
+                "cookies and site data for the identity provider and retry.",
+            );
+          }
+        }
+      })
       .catch((e: unknown) => {
         const err = e as { code?: string; message?: string };
+        try {
+          sessionStorage.removeItem(REDIRECT_PENDING_KEY);
+        } catch {
+          /* storage unavailable — nothing to clear */
+        }
         setRedirectError(
           `Redirect sign-in failed: ${err?.code ?? "unknown"} ${err?.message ?? String(e)}`,
         );
@@ -101,6 +138,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Explicit redirect path (LibreWolf, or Helium with third-party
     // cookies/site data allowed for the identity provider). Navigates away;
     // the getRedirectResult() call above completes it on return.
+    try {
+      sessionStorage.setItem(REDIRECT_PENDING_KEY, String(Date.now()));
+    } catch {
+      /* storage unavailable — return trip just won't be diagnosed */
+    }
     await signInWithRedirect(getFirebaseAuth(), buildProvider());
   };
 
