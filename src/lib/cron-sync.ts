@@ -119,6 +119,7 @@ export async function runSync(deps: SyncDeps): Promise<SyncResult> {
       breakfast,
       sageEventLabel: eventsByDate.get(id),
       sageWeek: anchor,
+      todayId,
     });
     batch.set(db.collection("days").doc(id), {
       ...merged,

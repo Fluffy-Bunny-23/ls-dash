@@ -12,15 +12,26 @@ export interface MergedInput {
   /** e.g. "Labor Day" from Sage getMonthlyEvents, if any. */
   sageEventLabel: string | undefined;
   sageWeek: string | null;
+  /** PT today id (YYYY-MM-DD). Only past/today dates may be rescued by Sage food. */
+  todayId: string;
 }
 
 /**
  * Merge iCal + Sage into one DayDoc (§§3–4).
- * Rule: Mon–Fri with no event in the feed = no school.
+ * Rule: Mon–Fri with no event in the feed = no school, EXCEPT when Sage shows
+ * food was actually served on a past/today weekday (e.g. 2026-09-03 full lunch
+ * + 2026-09-04 breakfast served, but the feed posts no ABC event for either).
+ * Feed absence on those days means "no ABC rotation posted", not "day off".
+ * Future dates still trust the feed alone — Sage doesn't publish that far
+ * ahead, so empty menus there prove nothing.
  */
 export function mergeDay(input: MergedInput): DayDoc {
-  const { dateId, occurrence, lunch, breakfast, sageEventLabel, sageWeek } = input;
-  const isNoSchool = !occurrence && !isWeekendId(dateId);
+  const { dateId, occurrence, lunch, breakfast, sageEventLabel, sageWeek, todayId } = input;
+  const servedFood =
+    lunch.all.length > 0 || breakfast.all.length > 0 || breakfast.daily.length > 0;
+  const servedWithoutSchedule =
+    !occurrence && !isWeekendId(dateId) && dateId <= todayId && servedFood;
+  const isNoSchool = !occurrence && !isWeekendId(dateId) && !servedWithoutSchedule;
   return {
     date: dateId,
     dow: dowShort(dateId),

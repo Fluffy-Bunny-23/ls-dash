@@ -57,6 +57,7 @@ describe("mergeDay", () => {
       breakfast: EMPTY_BREAKFAST,
       sageEventLabel: "Labor Day",
       sageWeek: "09/06/2026",
+      todayId: "2026-09-10",
     });
     expect(day).toMatchObject({
       date: "2026-09-07",
@@ -75,6 +76,7 @@ describe("mergeDay", () => {
       breakfast: EMPTY_BREAKFAST,
       sageEventLabel: undefined,
       sageWeek: null,
+      todayId: "2026-09-10",
     });
     expect(day.noSchoolLabel).toBe("No school");
   });
@@ -86,6 +88,7 @@ describe("mergeDay", () => {
       breakfast: { ...EMPTY_BREAKFAST, entree: "Bacon" },
       sageEventLabel: undefined,
       sageWeek: "09/06/2026",
+      todayId: "2026-09-10",
     });
     expect(day).toMatchObject({
       abc: "B",
@@ -97,6 +100,51 @@ describe("mergeDay", () => {
     expect(day.lunch.entree).toBe("Fajita Chicken Breast");
     expect(day.breakfast.entree).toBe("Bacon");
     expect(day.sources).toMatchObject({ icalUid: "u1", sageWeek: "09/06/2026" });
+  });
+  it("past weekday with Sage lunch but no feed event = school day, no ABC (2026-09-03)", () => {
+    const day = mergeDay({
+      dateId: "2026-09-03",
+      occurrence: undefined,
+      lunch: { ...EMPTY_LUNCH, entree: "Grilled Greek Chicken Breast", all: ["Grilled Greek Chicken Breast", "Gyro Bar"] },
+      breakfast: EMPTY_BREAKFAST,
+      sageEventLabel: undefined,
+      sageWeek: "08/30/2026",
+      todayId: "2026-09-10",
+    });
+    expect(day).toMatchObject({
+      abc: null,
+      isSpecial: false,
+      specialLabel: null,
+      isNoSchool: false,
+      noSchoolLabel: null,
+    });
+    expect(day.lunch.entree).toBe("Grilled Greek Chicken Breast");
+  });
+  it("past weekday with breakfast only but no feed event = school day (2026-09-04 early dismissal)", () => {
+    const day = mergeDay({
+      dateId: "2026-09-04",
+      occurrence: undefined,
+      lunch: EMPTY_LUNCH,
+      breakfast: { ...EMPTY_BREAKFAST, entree: "Grilled Ham", all: ["Grilled Ham", "Greek Scrambled Eggs"] },
+      sageEventLabel: undefined,
+      sageWeek: "08/30/2026",
+      todayId: "2026-09-10",
+    });
+    expect(day.isNoSchool).toBe(false);
+    expect(day.abc).toBeNull();
+  });
+  it("future weekday with no feed event stays no-school even if menus exist (Sage not yet published)", () => {
+    const day = mergeDay({
+      dateId: "2026-10-20",
+      occurrence: undefined,
+      lunch: { ...EMPTY_LUNCH, entree: "Grilled Greek Chicken Breast", all: ["Grilled Greek Chicken Breast"] },
+      breakfast: EMPTY_BREAKFAST,
+      sageEventLabel: undefined,
+      sageWeek: "10/18/2026",
+      todayId: "2026-09-10",
+    });
+    expect(day.isNoSchool).toBe(true);
+    expect(day.noSchoolLabel).toBe("No school");
   });
 });
 

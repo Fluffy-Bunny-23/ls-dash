@@ -72,55 +72,6 @@ function groupDetails(details: MenuItemDetail[]): Map<string, MenuItemDetail[]> 
   return sorted;
 }
 
-function dotColor(dot: string): string {
-  const d = dot.toLowerCase();
-  if (d.includes("green") && d.includes("yellow") && d.includes("red")) return "multi";
-  if (d === "green") return "bg-green-500";
-  if (d === "yellow") return "bg-yellow-400";
-  if (d === "red") return "bg-red-500";
-  if (d === "not serving") return "bg-stone-300";
-  return "bg-stone-300";
-}
-
-function DotIndicator({ dot }: { dot: string }) {
-  const lower = dot.toLowerCase();
-  const isMulti = lower.includes("/") && lower.includes("green");
-  // For "Green/Yellow/Red" show three dots like original (two-tone dots)
-  if (isMulti) {
-    return (
-      <span className="flex items-center gap-0.5" aria-label={dot} title={dot}>
-        <span className="h-2 w-2 rounded-full bg-green-700" />
-        <span className="h-2 w-2 rounded-full bg-yellow-400" />
-        <span className="h-2 w-2 rounded-full bg-red-500 opacity-0" style={{ display: "none" }} />
-        {/* emulate original's overlapping dots: show green + light green */}
-        <span className="hidden">multi</span>
-        <span className="flex -space-x-1">
-          <span className="h-2.5 w-2.5 rounded-full bg-green-700 ring-1 ring-white" />
-          <span className="h-2.5 w-2.5 rounded-full bg-green-200 ring-1 ring-white" />
-        </span>
-      </span>
-    );
-  }
-  // single dot variants
-  if (lower.includes("green") && lower.includes("yellow")) {
-    return (
-      <span className="flex -space-x-1" aria-label={dot} title={dot}>
-        <span className="h-2.5 w-2.5 rounded-full bg-green-600 ring-1 ring-white" />
-        <span className="h-2.5 w-2.5 rounded-full bg-green-200 ring-1 ring-white" />
-      </span>
-    );
-  }
-  const cls =
-    lower === "green"
-      ? "bg-green-600"
-      : lower === "yellow"
-        ? "bg-yellow-400"
-        : lower === "red"
-          ? "bg-red-500"
-          : "bg-stone-300";
-  return <span className={`h-2.5 w-2.5 rounded-full ${cls}`} aria-label={dot} title={dot} />;
-}
-
 function formatPrice(price: string): string | null {
   if (!price || price === "0" || price === "0.00") return null;
   const n = Number(price);
@@ -173,47 +124,42 @@ function MenuItemRow({ item }: { item: MenuItemDetail }) {
   const hasAllergens = item.allergens.length > 0 || item.maybeAllergens.length > 0;
   return (
     <div className="py-1">
-      <div className="flex items-start gap-2">
-        <span className="mt-1.5 shrink-0">
-          <DotIndicator dot={item.dot} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium leading-tight text-stone-900">{item.name}</p>
-          {price && <p className="text-xs text-stone-500">{price}</p>}
-          {item.station && (
-            <p className="text-xs italic text-stone-500">- {item.station}</p>
-          )}
-          {/* allergen toggle inline */}
-          {hasAllergens ? (
-            <button
-              onClick={() => setOpen((v) => !v)}
-              className="mt-0.5 text-[11px] font-medium text-amber-700 underline decoration-dotted underline-offset-2 hover:text-amber-800"
-              aria-expanded={open}
-            >
-              {open ? "Hide allergens" : `Allergens: ${item.allergens.join(", ") || item.maybeAllergens.slice(0, 2).join(", ") + "…"}`}
-            </button>
-          ) : null}
-          {open && <AllergenInfo item={item} />}
-          {/* always show lifestyle badges even when collapsed */}
-          {!open && item.lifestyle.length > 0 && (
-            <p className="mt-1">
-              {item.lifestyle.map((l) => (
-                <span
-                  key={l}
-                  className={`mr-1 inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
-                    l.toLowerCase() === "vegan"
-                      ? "bg-green-100 text-green-800"
-                      : l.toLowerCase() === "vegetarian"
-                        ? "bg-lime-100 text-lime-800"
-                        : "bg-stone-100 text-stone-600"
-                  }`}
-                >
-                  {l}
-                </span>
-              ))}
-            </p>
-          )}
-        </div>
+      <div className="min-w-0">
+        <p className="text-sm font-medium leading-tight text-stone-900">{item.name}</p>
+        {price && <p className="text-xs text-stone-500">{price}</p>}
+        {item.station && (
+          <p className="text-xs italic text-stone-500">- {item.station}</p>
+        )}
+        {/* allergen toggle inline */}
+        {hasAllergens ? (
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="mt-0.5 text-[11px] font-medium text-amber-700 underline decoration-dotted underline-offset-2 hover:text-amber-800"
+            aria-expanded={open}
+          >
+            {open ? "Hide allergens" : `Allergens: ${item.allergens.join(", ") || item.maybeAllergens.slice(0, 2).join(", ") + "…"}`}
+          </button>
+        ) : null}
+        {open && <AllergenInfo item={item} />}
+        {/* always show lifestyle badges even when collapsed */}
+        {!open && item.lifestyle.length > 0 && (
+          <p className="mt-1">
+            {item.lifestyle.map((l) => (
+              <span
+                key={l}
+                className={`mr-1 inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
+                  l.toLowerCase() === "vegan"
+                    ? "bg-green-100 text-green-800"
+                    : l.toLowerCase() === "vegetarian"
+                      ? "bg-lime-100 text-lime-800"
+                      : "bg-stone-100 text-stone-600"
+                }`}
+              >
+                {l}
+              </span>
+            ))}
+          </p>
+        )}
       </div>
     </div>
   );
