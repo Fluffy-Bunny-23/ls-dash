@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { PLACEHOLDER_SUPPORT_EMAIL, supportEmail } from "./config";
 import { formatUpdatedAgo, staleLine } from "./format";
-import { datesToPrune, isMetaStale, mergeDay } from "./sync";
+import { datesToPrune, isMetaStale, mergeDay, parseOverrideLabels } from "./sync";
 import { extractBreakfast, extractLunch } from "./sage";
 
 const EMPTY_LUNCH = extractLunch(undefined);
@@ -176,6 +176,57 @@ describe("mergeDay", () => {
     });
     expect(day.isNoSchool).toBe(true);
     expect(day.noSchoolLabel).toBe("Staff Development Day");
+  });
+  it("human override labels a no-school day, beating feed + Sage reasons", () => {
+    const day = mergeDay({
+      dateId: "2026-10-09",
+      occurrence: undefined,
+      lunch: EMPTY_LUNCH,
+      breakfast: EMPTY_BREAKFAST,
+      sageEventLabel: "Some Sage promo",
+      sageWeek: "10/04/2026",
+      todayId: "2026-09-10",
+      overrideLabel: "Staff Development Day",
+    });
+    expect(day.isNoSchool).toBe(true);
+    expect(day.noSchoolLabel).toBe("Staff Development Day");
+  });
+  it("human override never relabels a school day", () => {
+    const day = mergeDay({
+      dateId: "2026-09-09",
+      occurrence: { abc: "B", isSpecial: false, specialLabel: null, uid: "u1", isClosure: false },
+      lunch: EMPTY_LUNCH,
+      breakfast: EMPTY_BREAKFAST,
+      sageEventLabel: undefined,
+      sageWeek: "09/06/2026",
+      todayId: "2026-09-10",
+      overrideLabel: "Staff Development Day",
+    });
+    expect(day.isNoSchool).toBe(false);
+    expect(day.noSchoolLabel).toBeNull();
+    expect(day.abc).toBe("B");
+  });
+});
+
+describe("parseOverrideLabels", () => {
+  it("keeps valid date -> label pairs, trims whitespace", () => {
+    expect(parseOverrideLabels({ "2026-10-09": "  Staff Development Day  " })).toEqual(
+      new Map([["2026-10-09", "Staff Development Day"]]),
+    );
+  });
+  it("skips bad keys, non-string values, and blanks instead of failing", () => {
+    expect(
+      parseOverrideLabels({
+        "2026-10-09": "Staff Development Day",
+        "10/09/2026": "wrong shape",
+        "not-a-date": "x",
+        "2026-11-25": 42,
+        "2026-11-26": "   ",
+      }),
+    ).toEqual(new Map([["2026-10-09", "Staff Development Day"]]));
+    expect(parseOverrideLabels(null)).toEqual(new Map());
+    expect(parseOverrideLabels("nope")).toEqual(new Map());
+    expect(parseOverrideLabels(undefined)).toEqual(new Map());
   });
 });
 

@@ -94,8 +94,20 @@ never hits the network; the seed uses entrée names from `ref/Sage*.har`.
    `SAGE_BREAKFAST_MENU_ID=138778`. Do **not** set the `*_EMULATOR_HOST` vars.
 3. `vercel.json` already schedules `GET /api/cron/sync` at `0 12 * * *`.
    Vercel sends `Authorization: Bearer <CRON_SECRET>`; anything else gets 401.
- 4. Without emulator env vars, `/api/dev/token` returns 404 and the Dev
-    sign-in button is hidden — Google (hosted domain hint) is the only path.
+  4. Without emulator env vars, `/api/dev/token` returns 404 and the Dev
+     sign-in button is hidden — Google (hosted domain hint) is the only path.
+
+## Day-off reasons (`overrides/reasons`)
+
+A no-school weekday shows its reason from the calendar feed (closure event
+summary), else the Sage monthly label, else generic "No school". When
+neither source names one (e.g. 2026-10-09), attach the official reason by
+hand: Firebase console → Firestore → create collection `overrides`, doc
+`reasons`, one field per date — `"2026-10-09": "Staff Development Day"`.
+The next cron sync bakes it into that day's label (no redeploy needed).
+It only labels days already determined no-school; it never overrides an
+ABC/special school day. Clients can't read or write this doc (rules deny
+it); only the cron's Admin SDK reads it.
 
 ## Google sign-in in privacy-hardened browsers (Helium, LibreWolf, …)
 

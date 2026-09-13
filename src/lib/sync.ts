@@ -14,6 +14,32 @@ export interface MergedInput {
   sageWeek: string | null;
   /** PT today id (YYYY-MM-DD). Only past/today dates may be rescued by Sage food. */
   todayId: string;
+  /**
+   * Human-supplied reason from the `overrides/reasons` Firestore doc
+   * (e.g. "Staff Development Day"). Only labels days already determined
+   * no-school — it never overrides an ABC/special school day.
+   */
+  overrideLabel?: string;
+}
+
+/** Firestore `overrides/reasons` doc id. */
+export const REASONS_DOC = "overrides/reasons";
+
+/**
+ * Parse the reasons doc into dateId -> label. Lenient by design: the sync
+ * must never fail because of a hand-edited doc — bad entries are skipped.
+ */
+export function parseOverrideLabels(data: unknown): Map<string, string> {
+  const out = new Map<string, string>();
+  if (!data || typeof data !== "object" || Array.isArray(data)) return out;
+  for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) continue;
+    if (typeof value !== "string") continue;
+    const label = value.replace(/\s+/g, " ").trim().slice(0, 120);
+    if (!label) continue;
+    out.set(key, label);
+  }
+  return out;
 }
 
 /**
@@ -26,7 +52,7 @@ export interface MergedInput {
  * ahead, so empty menus there prove nothing.
  */
 export function mergeDay(input: MergedInput): DayDoc {
-  const { dateId, occurrence, lunch, breakfast, sageEventLabel, sageWeek, todayId } = input;
+  const { dateId, occurrence, lunch, breakfast, sageEventLabel, sageWeek, todayId, overrideLabel } = input;
   const servedFood =
     lunch.all.length > 0 || breakfast.all.length > 0 || breakfast.daily.length > 0;
   const servedWithoutSchedule =
@@ -44,9 +70,10 @@ export function mergeDay(input: MergedInput): DayDoc {
     specialLabel: !isClosureDay ? (occurrence?.specialLabel ?? null) : null,
     isNoSchool,
     noSchoolLabel: isNoSchool
-      ? (isClosureDay
-          ? (occurrence?.specialLabel ?? sageEventLabel ?? "No school")
-          : (sageEventLabel ?? "No school"))
+      ? (overrideLabel ??
+        (isClosureDay ? occurrence?.specialLabel : undefined) ??
+        sageEventLabel ??
+        "No school")
       : null,
     lunch: {
       entree: lunch.entree,
