@@ -99,30 +99,11 @@ never hits the network; the seed uses entrée names from `ref/Sage*.har`.
 
 ## Google sign-in in privacy-hardened browsers (Helium, LibreWolf, …)
 
-Popup is the primary flow and works even when the browser partitions
-third-party storage. Redirect is offered as an explicit fallback button —
-the app never silently swaps to it (that swap was the old silent-login-loop).
+Popup is the only sign-in flow and works even when the browser partitions
+third-party storage.
 
-- Helium blocks popups and third-party cookies by default. For **popup**:
-  allow popups for the site. For **redirect**: allow third-party cookies and
-  on-device site data for `accounts.google.com`, `google.com`, the
-  `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` host, and the app domain.
-- Redirect failures are now surfaced on the login wall (previously
-  `getRedirectResult()` errors were swallowed, i.e. the silent loop).
-- Optional hardening if redirect must survive third-party-cookie blocking
-  (Firebase "Option 3", same-origin helper):
-  1. Deploy with the `/__/auth/*` rewrite in `next.config.ts` (already in
-     the repo — it proxies to `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`).
-  2. Set `NEXT_PUBLIC_FIREBASE_SELF_HOST_AUTH_HELPER=true` on the
-     deployment so `authDomain` becomes the app's own host.
-  3. Firebase console → Authentication → Settings → Authorized domains: add
-     the app domain.
-  4. Google Cloud console → APIs & Services → Credentials → OAuth 2.0
-     Client for the Firebase project: add
-     `https://<app-domain>/__/auth/handler` as an authorized redirect URI
-     (and the corresponding ACS/authorized-JS-origin entry for the domain).
-  5. Redeploy, then verify redirect in Helium with third-party cookies
-     still blocked.
+- Helium blocks popups and third-party cookies by default: allow popups for
+  the site to sign in.
 
 ## Notes / deviations from `ref/lsdash-plan.md`
 
