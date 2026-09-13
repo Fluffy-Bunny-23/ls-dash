@@ -11,15 +11,16 @@ const SAMPLE = readFileSync(join(__dirname, "__fixtures__", "calendar_436.sample
 
 describe("classifyIcalSummary", () => {
   it("parses plain A/B/C days", () => {
-    expect(classifyIcalSummary("MS A day")).toEqual({ abc: "A", isSpecial: false, specialLabel: null });
-    expect(classifyIcalSummary("MS B day")).toEqual({ abc: "B", isSpecial: false, specialLabel: null });
-    expect(classifyIcalSummary("MS C day")).toEqual({ abc: "C", isSpecial: false, specialLabel: null });
+    expect(classifyIcalSummary("MS A day")).toEqual({ abc: "A", isSpecial: false, specialLabel: null, isClosure: false });
+    expect(classifyIcalSummary("MS B day")).toEqual({ abc: "B", isSpecial: false, specialLabel: null, isClosure: false });
+    expect(classifyIcalSummary("MS C day")).toEqual({ abc: "C", isSpecial: false, specialLabel: null, isClosure: false });
   });
   it("parses special letter days, keeping the raw label", () => {
     expect(classifyIcalSummary("MS special B day schedule")).toEqual({
       abc: "B",
       isSpecial: true,
       specialLabel: "MS special B day schedule",
+      isClosure: false,
     });
     expect(classifyIcalSummary("MS special A day schedule").abc).toBe("A");
     expect(classifyIcalSummary("MS special C day schedule").abc).toBe("C");
@@ -29,6 +30,7 @@ describe("classifyIcalSummary", () => {
       abc: null,
       isSpecial: true,
       specialLabel: "MS sports day (no ABC schedule today)",
+      isClosure: false,
     });
   });
   it("treats special schedules without a letter as special with null ABC", () => {
@@ -36,17 +38,38 @@ describe("classifyIcalSummary", () => {
       abc: null,
       isSpecial: true,
       specialLabel: "MS special schedule (first day of school)",
+      isClosure: false,
     });
     expect(classifyIcalSummary("MS Field Day (special schedule)")).toEqual({
       abc: null,
       isSpecial: true,
       specialLabel: "MS Field Day (special schedule)",
+      isClosure: false,
     });
   });
   it("does not mistake other words for ABC letters", () => {
     // 'S' in "sports"/"schedule"/"school" and 'F' in "Field" must not match [ABC].
     expect(classifyIcalSummary("MS sports day").abc).toBeNull();
     expect(classifyIcalSummary("MS Field Day").abc).toBeNull();
+  });
+  it("flags closure summaries, keeping the raw summary as the reason", () => {
+    for (const s of [
+      "Thanksgiving Break",
+      "Winter Break",
+      "No School",
+      "No School - Staff Development Day",
+      "School Closed - Holiday",
+      "Veterans Day",
+    ]) {
+      expect(classifyIcalSummary(s)).toMatchObject({ abc: null, isSpecial: false, specialLabel: s, isClosure: true });
+    }
+  });
+  it("never flags school days as closures", () => {
+    expect(classifyIcalSummary("MS A day").isClosure).toBe(false);
+    expect(classifyIcalSummary("MS sports day (no ABC schedule today)").isClosure).toBe(false);
+    expect(classifyIcalSummary("MS special schedule (first day of school)").isClosure).toBe(false);
+    expect(classifyIcalSummary("MS sports day").isClosure).toBe(false);
+    expect(classifyIcalSummary("MS Field Day").isClosure).toBe(false);
   });
 });
 

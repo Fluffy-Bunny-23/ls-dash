@@ -13,25 +13,46 @@ export interface IcalEvent {
 const ABC_RE = /\bMS\s+(?:special\s+)?([ABC])\s+day\b/i;
 const NO_ABC_RE = /no ABC schedule today/i;
 const SPECIAL_RE = /special/i;
+/**
+ * Closure language: a day students don't attend. Only consulted when the
+ * summary has no ABC letter and isn't special — so letter days, sports-day
+ * overrides ("no ABC schedule today" is handled above as a school day) and
+ * special schedules can never match. Deliberately excludes half-day phrasing
+ * ("half day", "early dismissal", "conferences") — those are school days.
+ */
+const CLOSURE_RE =
+  /\b(no\s+school|schools?\s+closed|closed|holidays?|days?\s+off|staff\s+(?:day|development)|professional\s+development|in-?service|teacher\s+work\s*day|break|vacation|thanksgiving|christmas|labor\s+day|memorial\s+day|veterans\s+day|presidents\s+day|martin\s+luther\s+king[^,;]*day|columbus\s+day|indigenous\s+peoples\s+day)\b/i;
 
 export interface ClassifiedDay {
   abc: AbcDay | null;
   isSpecial: boolean;
   specialLabel: string | null;
+  /**
+   * True when the summary names a closure (no ABC letter, not special).
+   * The merger treats these as no-school days and reuses `specialLabel`
+   * (the raw summary) as the human reason, e.g. "Thanksgiving Break".
+   */
+  isClosure: boolean;
 }
 
 /** Classify one SUMMARY per §3b. No-ABC override wins over the ABC letter. */
 export function classifyIcalSummary(summary: string): ClassifiedDay {
   const s = summary.trim();
   if (NO_ABC_RE.test(s)) {
-    return { abc: null, isSpecial: true, specialLabel: s };
+    return { abc: null, isSpecial: true, specialLabel: s, isClosure: false };
   }
   const abcMatch = ABC_RE.exec(s);
   const abc = abcMatch ? (abcMatch[1].toUpperCase() as AbcDay) : null;
   if (SPECIAL_RE.test(s)) {
-    return { abc, isSpecial: true, specialLabel: s };
+    return { abc, isSpecial: true, specialLabel: s, isClosure: false };
   }
-  return { abc, isSpecial: false, specialLabel: null };
+  if (abc) {
+    return { abc, isSpecial: false, specialLabel: null, isClosure: false };
+  }
+  if (CLOSURE_RE.test(s)) {
+    return { abc: null, isSpecial: false, specialLabel: s, isClosure: true };
+  }
+  return { abc: null, isSpecial: false, specialLabel: null, isClosure: false };
 }
 
 /** RFC 5545 line unfolding: continuation lines begin with SP/HTAB. */

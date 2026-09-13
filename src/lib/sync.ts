@@ -31,15 +31,23 @@ export function mergeDay(input: MergedInput): DayDoc {
     lunch.all.length > 0 || breakfast.all.length > 0 || breakfast.daily.length > 0;
   const servedWithoutSchedule =
     !occurrence && !isWeekendId(dateId) && dateId <= todayId && servedFood;
-  const isNoSchool = !occurrence && !isWeekendId(dateId) && !servedWithoutSchedule;
+  const isClosureDay = occurrence?.isClosure === true;
+  // A closure event in the feed means no school even if Sage posted a menu
+  // (future cycle menus can be retracted); the raw summary is the reason.
+  const isNoSchool =
+    !isWeekendId(dateId) && (isClosureDay || (!occurrence && !servedWithoutSchedule));
   return {
     date: dateId,
     dow: dowShort(dateId),
-    abc: occurrence?.abc ?? null,
-    isSpecial: occurrence?.isSpecial ?? false,
-    specialLabel: occurrence?.specialLabel ?? null,
+    abc: isClosureDay ? null : (occurrence?.abc ?? null),
+    isSpecial: occurrence && !isClosureDay ? occurrence.isSpecial : false,
+    specialLabel: !isClosureDay ? (occurrence?.specialLabel ?? null) : null,
     isNoSchool,
-    noSchoolLabel: isNoSchool ? (sageEventLabel ?? "No school") : null,
+    noSchoolLabel: isNoSchool
+      ? (isClosureDay
+          ? (occurrence?.specialLabel ?? sageEventLabel ?? "No school")
+          : (sageEventLabel ?? "No school"))
+      : null,
     lunch: {
       entree: lunch.entree,
       special: lunch.special,

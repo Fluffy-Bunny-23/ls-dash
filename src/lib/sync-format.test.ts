@@ -83,7 +83,7 @@ describe("mergeDay", () => {
   it("ABC + special + entrées merge", () => {
     const day = mergeDay({
       dateId: "2026-09-09",
-      occurrence: { abc: "B", isSpecial: true, specialLabel: "MS special B day schedule", uid: "u1" },
+      occurrence: { abc: "B", isSpecial: true, specialLabel: "MS special B day schedule", uid: "u1", isClosure: false },
       lunch: { ...EMPTY_LUNCH, entree: "Fajita Chicken Breast" },
       breakfast: { ...EMPTY_BREAKFAST, entree: "Bacon" },
       sageEventLabel: undefined,
@@ -145,6 +145,37 @@ describe("mergeDay", () => {
     });
     expect(day.isNoSchool).toBe(true);
     expect(day.noSchoolLabel).toBe("No school");
+  });
+  it("closure event in the feed => no-school with the summary as the reason", () => {
+    const day = mergeDay({
+      dateId: "2026-11-25",
+      occurrence: { abc: null, isSpecial: false, specialLabel: "Thanksgiving Break", uid: "break-1", isClosure: true },
+      lunch: EMPTY_LUNCH,
+      breakfast: EMPTY_BREAKFAST,
+      sageEventLabel: undefined,
+      sageWeek: "11/22/2026",
+      todayId: "2026-09-10",
+    });
+    expect(day).toMatchObject({
+      abc: null,
+      isSpecial: false,
+      specialLabel: null,
+      isNoSchool: true,
+      noSchoolLabel: "Thanksgiving Break",
+    });
+  });
+  it("closure wins over a posted Sage menu (future cycle menus can be retracted)", () => {
+    const day = mergeDay({
+      dateId: "2026-10-09",
+      occurrence: { abc: null, isSpecial: false, specialLabel: "Staff Development Day", uid: "sd-1", isClosure: true },
+      lunch: { ...EMPTY_LUNCH, entree: "Grilled Greek Chicken Breast", all: ["Grilled Greek Chicken Breast"] },
+      breakfast: EMPTY_BREAKFAST,
+      sageEventLabel: undefined,
+      sageWeek: "10/04/2026",
+      todayId: "2026-09-10",
+    });
+    expect(day.isNoSchool).toBe(true);
+    expect(day.noSchoolLabel).toBe("Staff Development Day");
   });
 });
 
