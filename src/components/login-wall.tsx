@@ -51,9 +51,6 @@ export function LoginWall() {
         >
           {busy ? "Opening sign-in…" : "Continue with Google"}
         </Button>
-        <p className="mt-3 text-xs text-stone-500">
-          Privacy-hardened browser? Allow popups for this site to sign in.
-        </p>
         {emulatorMode && (
           <Button variant="outline" className="mt-2 w-full" onClick={doDev}>
             Dev sign-in
