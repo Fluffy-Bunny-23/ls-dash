@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useMonthDays } from "@/lib/use-days";
-import { monthWeekdayIds, weekdayOfId } from "@/lib/dates";
+import { monthWeekdayIds, todayPtId, weekdayOfId } from "@/lib/dates";
 import { pickCellEntree } from "@/lib/sage";
 import type { DayDoc } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -86,6 +86,7 @@ function MonthInner() {
 
   const ids = useMemo(() => monthWeekdayIds(month), [month]);
   const { days, loaded } = useMonthDays(user && schoolUser ? month : "0000-00");
+  const todayId = useMemo(() => todayPtId(), []);
 
   // Weekday-only rows: chunk Mon–Fri ids into Mon-start weeks.
   const weeks = useMemo(() => {
@@ -174,12 +175,14 @@ function MonthInner() {
                     {row.map((id) => {
                       const day = days.get(id);
                       const off = day?.isNoSchool ?? false;
+                      const isToday = id === todayId;
                       return (
                         <Link
                           key={id}
                           href={`/?d=${id}`}
                           data-date={id}
                           data-noschool={off ? "true" : "false"}
+                          data-today={isToday ? "true" : "false"}
                           title={id}
                           className={cn(
                             "min-h-20 rounded-lg border bg-white p-1.5 text-left hover:border-secondary sm:min-h-24 sm:p-2",
@@ -188,6 +191,7 @@ function MonthInner() {
                               : day?.isSpecial
                                 ? "border-amber-300"
                                 : "border-stone-200",
+                            isToday && "border-blue-500",
                           )}
                         >
                           <div className="flex items-start justify-between gap-1">
