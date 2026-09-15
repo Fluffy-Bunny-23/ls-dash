@@ -230,6 +230,8 @@ try {
   check("weekend days have no cells", gridInfo.sat === 0 && gridInfo.sun === 0);
   check("month cell shows lunch entrée", gridInfo.sept8?.includes("Italian-Roasted Pork Loin") ?? false, gridInfo.sept8?.slice(0, 60));
   check("no-school cell labeled", gridInfo.sept7?.includes("Labor Day") ?? false, gridInfo.sept7?.slice(0, 60));
+  const miCell = await cdp.eval(() => document.querySelector('[data-date="2026-09-14"]')?.innerText);
+  check("month cell shows Main Ingredient entrée, not Entrées[0]", miCell?.includes("Chicken Tenders") ?? false, miCell?.slice(0, 80));
 
   // ---- 4. Click a month cell -> Today for that date ----
   // The only seeded special day is 10-14, so page the month grid to October
@@ -269,7 +271,7 @@ try {
 
   // ---- 8b. Root defaults to today, auto-advancing past weekends ----
   await cdp.goto(`${BASE}/`);
-  const landed = await cdp.eval(() => {
+  const landing = await cdp.eval(() => {
     const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Los_Angeles", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
     const wd = (id) => new Date(id + "T00:00:00Z").getUTCDay();
     const add = (id, n) => {
@@ -278,10 +280,15 @@ try {
     };
     let cur = parts;
     while (wd(cur) === 0 || wd(cur) === 6) cur = add(cur, 1);
-    return cur;
+    // Weekdays render today in place (no ?d= rewrite); weekends bounce to Monday.
+    return { landed: cur, isWeekend: cur !== parts };
   });
-  await cdp.waitFor(`() => new URL(location.href).searchParams.get("d") === "${landed}"`);
-  check("root defaults to next school day", true, `${await cdp.eval(() => location.href)} (expected ${landed})`);
+  if (landing.isWeekend) {
+    await cdp.waitFor(`() => new URL(location.href).searchParams.get("d") === "${landing.landed}"`);
+  } else {
+    await cdp.waitFor(() => !!document.querySelector("h1"));
+  }
+  check("root defaults to next school day", true, `${await cdp.eval(() => location.href)} (expected ${landing.landed})`);
 
   // ---- 8c. Day with no doc shows the empty state ----
   await cdp.goto(`${BASE}/?d=2026-10-20`);

@@ -274,9 +274,42 @@ export function extractBreakfast(day: SageDay | undefined): BreakfastExtract {
   return { entree: entrees[0] ?? null, all, daily, details, dailyDetails };
 }
 
-/** Month-cell priority (§3a): Entrées[0] → Specials[0] → Features[0]. */
-export function pickCellEntree(lunch: Pick<LunchExtract, "entree" | "special" | "feature">): string | null {
-  return lunch.entree ?? lunch.special ?? lunch.feature;
+/** Sage station serving the headline hot lunch (verified live 2026-09-14:
+ *  "The Main Ingredient®" serves e.g. Chicken Tenders / Barbecue Beef
+ *  Brisket while Entrées[0] is the Free Style™ item). Station names carry
+ *  ®/™ suffixes and varying whitespace — normalize before comparing. */
+function normalizeStation(s: string): string {
+  return normalizeName(s)
+    .replace(/[®™©]/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+export function isMainIngredientStation(station: string): boolean {
+  const n = normalizeStation(station);
+  return n === "the main ingredient" || n === "main ingredient";
+}
+
+/** Month-cell lunch: the Main Ingredient station entrée when the stored
+ *  details name one, else the classic Entrées[0] → Specials[0] →
+ *  Features[0] order. Docs written before details existed (or the seed's
+ *  summary docs) fall through to the classic order automatically. */
+export function pickCellEntree(
+  lunch: Pick<LunchExtract, "entree" | "special" | "feature"> & { details?: MenuItemDetail[] },
+): string | null {
+  const details = lunch.details;
+  if (details) {
+    const atStation = details.filter((d) => isMainIngredientStation(d.station));
+    const entree = atStation.find((d) => d.category === "Entrées");
+    if (entree) return entree.name;
+  }
+  const fallback = lunch.entree ?? lunch.special ?? lunch.feature;
+  if (fallback) return fallback;
+  if (details) {
+    const anyStation = details.find((d) => isMainIngredientStation(d.station));
+    if (anyStation) return anyStation.name;
+  }
+  return null;
 }
 
 /** Find the week payload's day object for a YYYY-MM-DD id. */

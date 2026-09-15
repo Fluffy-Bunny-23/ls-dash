@@ -5,6 +5,7 @@ import {
   categoryNames,
   extractBreakfast,
   extractLunch,
+  isMainIngredientStation,
   normalizeName,
   pickCellEntree,
   type SageWeek,
@@ -107,6 +108,56 @@ describe("daily offerings (single-day payloads)", () => {
     const day = breakfast.weekly["09/09/2026"] as Record<string, unknown>;
     expect("Daily" in day).toBe(false);
     expect(extractBreakfast(day as Parameters<typeof extractBreakfast>[0]).daily).toEqual([]);
+  });
+});
+
+describe("month-cell Main Ingredient priority", () => {
+  // Shape mirrors the live 09/14/2026 payload (verified 2026-09-14): the
+  // headline hot lunch lives at "The Main Ingredient®", NOT Entrées[0].
+  const miDay = {
+    "Entrées": [
+      { meal: "Lunch", name: "Honey-Glazed Ham", displayStation: "Free Style™" },
+      { meal: "Lunch", name: "Chicken Tenders", displayStation: "The Main Ingredient®" },
+      { meal: "Lunch", name: "Soynut Butter and Jelly on White Bread", displayStation: "The Classic Cuts Deli®" },
+    ],
+    "Specials": [{ meal: "Lunch", name: "Chicken Finger Dipping Bar", displayStation: "Seasonings" }],
+  } as Parameters<typeof extractLunch>[0];
+
+  it("prefers the Main Ingredient station entrée over Entrées[0]", () => {
+    const ex = extractLunch(miDay);
+    expect(ex.entree).toBe("Honey-Glazed Ham"); // stored entrée unchanged
+    expect(pickCellEntree(ex)).toBe("Chicken Tenders");
+  });
+  it("matches station names case-insensitively, ®-insensitively", () => {
+    expect(isMainIngredientStation("The Main Ingredient®")).toBe(true);
+    expect(isMainIngredientStation("the main ingredient")).toBe(true);
+    expect(isMainIngredientStation("  Main   Ingredient™ ")).toBe(true);
+    expect(isMainIngredientStation("Free Style™")).toBe(false);
+    expect(isMainIngredientStation("")).toBe(false);
+  });
+  it("a Main Ingredient side never beats a real entrée", () => {
+    const day = {
+      "Entrées": [{ meal: "Lunch", name: "Honey-Glazed Ham", displayStation: "Free Style™" }],
+      "Sides and Vegetables": [{ meal: "Lunch", name: "Steamed Broccoli", displayStation: "The Main Ingredient®" }],
+    } as Parameters<typeof extractLunch>[0];
+    expect(pickCellEntree(extractLunch(day))).toBe("Honey-Glazed Ham");
+  });
+  it("falls back to entrée order when no Main Ingredient station exists (HAR 09/09)", () => {
+    const ex = extractLunch(lunch.weekly["09/09/2026"] as Parameters<typeof extractLunch>[0]);
+    expect(ex.details!.length).toBeGreaterThan(0); // details present, just no MI station
+    expect(pickCellEntree(ex)).toBe("Fajita Chicken Breast");
+  });
+  it("summary docs without details keep the classic order", () => {
+    expect(pickCellEntree({ entree: "E", special: "S", feature: "F" })).toBe("E");
+    expect(pickCellEntree({ entree: null, special: "S", feature: "F" })).toBe("S");
+    expect(pickCellEntree({ entree: null, special: null, feature: "F" })).toBe("F");
+    expect(pickCellEntree({ entree: null, special: null, feature: null })).toBeNull();
+  });
+  it("a lone Main Ingredient item still surfaces when entrées are absent", () => {
+    const day = {
+      "Desserts": [{ meal: "Lunch", name: "Seasonal Crisp", displayStation: "The Main Ingredient" }],
+    } as Parameters<typeof extractLunch>[0];
+    expect(pickCellEntree(extractLunch(day))).toBe("Seasonal Crisp");
   });
 });
 
