@@ -137,6 +137,51 @@ async function main(): Promise<void> {
       },
       sources: { icalUid: "12485798@www.example-school.org", sageWeek: "09/06/2026" }, updatedAt: stamp,
     },
+    // Mon 09-14: LIVE Sage week of 09/14/2026 (fetched 2026-09-14, extractor
+    // output verbatim). The month overview must show the Main Ingredient
+    // station entrée ("Chicken Tenders"), not Entrées[0]
+    // ("Honey-Glazed Ham"). ABC is null: the school feed URL is a placeholder
+    // in local dev, so no ABC rotation is verifiable offline — a school day
+    // with good Sage service and no ABC is an established pattern (see
+    // mergeDay's 2026-09-03 case). No single-day Daily probe was run for
+    // 09-14, so breakfast.daily is [].
+    "2026-09-14": {
+      date: "2026-09-14", dow: "Mon", abc: null, isSpecial: false, specialLabel: null,
+      isNoSchool: false, noSchoolLabel: null,
+      lunch: {
+        entree: "Honey-Glazed Ham", special: "Chicken Finger Dipping Bar", feature: null,
+        soups: ["Chicken and Rice Soup"],
+        sides: ["Steamed Broccoli", "Roasted Sweet Potatoes", "Rice Pilaf", "Yellow Squash with Thyme and Basil"],
+        all: ["Honey-Glazed Ham", "Chicken Tenders", "Red Bean and Kale Quinoa", "Chicken Salad Wrap", "Soynut Butter and Jelly on White Bread", "Chicken Finger Dipping Bar", "Chicken and Rice Soup", "Black Bean and Corn Salad", "Greek Tomato and Cucumber Salad", "Pesto Penne Salad", "Cheddar Cheese", "Hummus", "Steamed Broccoli", "Roasted Sweet Potatoes", "Rice Pilaf", "Yellow Squash with Thyme and Basil", "Cantaloupe", "Pineapple", "Cinnamon-Sugar Doughnut Holes"],
+        details: [
+          { name: "Honey-Glazed Ham", category: "Entrées", station: "Free Style™", price: "0", dot: "Red", allergens: [], maybeAllergens: [], lifestyle: [] },
+          { name: "Chicken Tenders", category: "Entrées", station: "The Main Ingredient®", price: "0", dot: "Yellow", allergens: ["Wheat", "Gluten"], maybeAllergens: ["Oil"], lifestyle: [] },
+          { name: "Red Bean and Kale Quinoa", category: "Entrées", station: "Vegitas®", price: "0", dot: "Green", allergens: [], maybeAllergens: [], lifestyle: ["Vegan"] },
+          { name: "Chicken Salad Wrap", category: "Entrées", station: "The Classic Cuts Deli®", price: "0", dot: "Red", allergens: ["Wheat", "Gluten", "Egg"], maybeAllergens: ["Milk", "Soy", "Mustard", "Sulfites"], lifestyle: [] },
+          { name: "Soynut Butter and Jelly on White Bread", category: "Entrées", station: "The Classic Cuts Deli®", price: "0", dot: "Yellow", allergens: ["Wheat", "Gluten", "Soy"], maybeAllergens: ["Egg", "Milk", "Sesame", "Sulfites"], lifestyle: ["Vegetarian"] },
+          { name: "Chicken Finger Dipping Bar", category: "Specials", station: "Seasonings", price: "0", dot: "Green/Yellow/Red", allergens: ["Milk", "Soy", "Mustard"], maybeAllergens: ["Wheat", "Gluten", "Egg", "Fish", "Sesame", "Sulfites"], lifestyle: [] },
+          { name: "Chicken and Rice Soup", category: "Soups", station: "Ladle & Co.", price: "0", dot: "Red", allergens: [], maybeAllergens: [], lifestyle: [] },
+          { name: "Black Bean and Corn Salad", category: "Salads", station: "Improvisations®", price: "0", dot: "Yellow", allergens: [], maybeAllergens: [], lifestyle: ["Vegetarian"] },
+          { name: "Greek Tomato and Cucumber Salad", category: "Salads", station: "Improvisations®", price: "0", dot: "Yellow", allergens: ["Milk"], maybeAllergens: ["Sulfites"], lifestyle: ["Vegetarian"] },
+          { name: "Pesto Penne Salad", category: "Salads", station: "Improvisations®", price: "0", dot: "Green", allergens: ["Wheat", "Gluten", "Milk"], maybeAllergens: ["Egg"], lifestyle: ["Vegetarian"] },
+          { name: "Cheddar Cheese", category: "Deli", station: "The Classic Cuts Deli®", price: "0", dot: "Red", allergens: ["Milk"], maybeAllergens: [], lifestyle: ["Vegetarian"] },
+          { name: "Hummus", category: "Deli", station: "The Classic Cuts Deli®", price: "0", dot: "Green", allergens: ["Sesame"], maybeAllergens: [], lifestyle: ["Vegan"] },
+          { name: "Steamed Broccoli", category: "Sides and Vegetables", station: "The Main Ingredient®, Free Style™", price: "0", dot: "Green", allergens: [], maybeAllergens: [], lifestyle: ["Vegan"] },
+          { name: "Roasted Sweet Potatoes", category: "Sides and Vegetables", station: "Free Style™", price: "0", dot: "Green", allergens: [], maybeAllergens: [], lifestyle: ["Vegan"] },
+          { name: "Rice Pilaf", category: "Sides and Vegetables", station: "The Main Ingredient®", price: "0", dot: "Yellow", allergens: ["Milk"], maybeAllergens: [], lifestyle: [] },
+          { name: "Yellow Squash with Thyme and Basil", category: "Sides and Vegetables", station: "Vegitas®", price: "0", dot: "Yellow", allergens: [], maybeAllergens: [], lifestyle: ["Vegan"] },
+          { name: "Cantaloupe", category: "Desserts", station: "Improvisations®", price: "0", dot: "Green", allergens: [], maybeAllergens: [], lifestyle: ["Vegan"] },
+          { name: "Pineapple", category: "Desserts", station: "Improvisations®", price: "0", dot: "Green", allergens: [], maybeAllergens: [], lifestyle: ["Vegan"] },
+          { name: "Cinnamon-Sugar Doughnut Holes", category: "Desserts", station: "P.S.", price: "0", dot: "Red", allergens: ["Wheat", "Gluten", "Egg", "Milk", "Soy"], maybeAllergens: [], lifestyle: ["Vegetarian"] },
+        ],
+      },
+      breakfast: {
+        entree: "Bacon",
+        all: ["Bacon", "Turkey Bacon", "Western Scrambled Eggs", "Bagel & Cream Cheese", "Sticky Rice", "Cinnamon Rolls", "Croissants", "Pineapple Cup", "Red Grapes Cup", "Strawberry Cup", "S'mores Pudding Parfait", "Strawberry Shortcake Parfait"],
+        daily: [],
+      },
+      sources: { icalUid: null, sageWeek: "09/14/2026" }, updatedAt: stamp,
+    },
     // Sat 09-12: SYNTHETIC weekend doc — must never be navigable/rendered.
     "2026-09-12": {
       date: "2026-09-12", dow: "Sat", abc: null, isSpecial: false, specialLabel: null,
