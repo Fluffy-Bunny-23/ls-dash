@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useMonthDays } from "@/lib/use-days";
-import { monthWeekdayIds, todayPtId, weekdayOfId } from "@/lib/dates";
+import { monthGridWeeks, todayPtId } from "@/lib/dates";
 import { pickCellEntree } from "@/lib/sage";
 import type { DayDoc } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -84,30 +84,11 @@ function MonthInner() {
     document.title = user && schoolUser ? "LS Dash" : "Please sign in to continue";
   }, [user, schoolUser]);
 
-  const ids = useMemo(() => monthWeekdayIds(month), [month]);
   const { days, loaded } = useMonthDays(user && schoolUser ? month : "0000-00");
   const todayId = useMemo(() => todayPtId(), []);
 
-  // Weekday-only rows: chunk Mon–Fri ids into Mon-start weeks.
-  // Pad the first row with blank cells so e.g. a Thursday 1st lands
-  // under the Thu column instead of the Mon column.
-  const weeks = useMemo(() => {
-    const rows: (string | null)[][] = [];
-    let row: (string | null)[] = [];
-    for (const id of ids) {
-      if (weekdayOfId(id) === 1 && row.length > 0) {
-        rows.push(row);
-        row = [];
-      }
-      if (rows.length === 0 && row.length === 0) {
-        const offset = weekdayOfId(id) - 1; // Mon=0 ... Fri=4
-        for (let k = 0; k < offset; k++) row.push(null);
-      }
-      row.push(id);
-    }
-    if (row.length > 0) rows.push(row);
-    return rows;
-  }, [ids]);
+  // Weekday-only Mon–Fri grid; blanks pad a mid-week 1st into its column.
+  const weeks = useMemo(() => monthGridWeeks(month), [month]);
 
   if (authLoading) {
     return (
