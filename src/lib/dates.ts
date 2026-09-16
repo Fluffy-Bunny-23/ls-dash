@@ -94,6 +94,32 @@ export function monthWeekdayIds(yyyyMM: string): string[] {
   return out;
 }
 
+/**
+ * Weekday-only month grid rows for the 5-column Mon–Fri view.
+ * Each row is Mon..Fri slots; `null` is a blank pad so a mid-week 1st
+ * (e.g. Thursday Oct 1 2026) lands under its weekday column instead of
+ * the Monday column. A 1st falling on Sat/Sun yields no leading blanks
+ * since the first weekday id is already a Monday.
+ */
+export function monthGridWeeks(yyyyMM: string): (string | null)[][] {
+  const ids = monthWeekdayIds(yyyyMM);
+  const rows: (string | null)[][] = [];
+  let row: (string | null)[] = [];
+  for (const id of ids) {
+    if (weekdayOfId(id) === 1 && row.length > 0) {
+      rows.push(row);
+      row = [];
+    }
+    if (rows.length === 0 && row.length === 0) {
+      const offset = weekdayOfId(id) - 1; // Mon=0 ... Fri=4
+      for (let k = 0; k < offset; k++) row.push(null);
+    }
+    row.push(id);
+  }
+  if (row.length > 0) rows.push(row);
+  return rows;
+}
+
 /** Pretty header label, e.g. "Friday, September 11". Avoids Date tz pitfalls. */
 export function prettyDate(id: string): string {
   const MONTHS = [
