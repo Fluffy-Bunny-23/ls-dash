@@ -89,13 +89,19 @@ function MonthInner() {
   const todayId = useMemo(() => todayPtId(), []);
 
   // Weekday-only rows: chunk Mon–Fri ids into Mon-start weeks.
+  // Pad the first row with blank cells so e.g. a Thursday 1st lands
+  // under the Thu column instead of the Mon column.
   const weeks = useMemo(() => {
-    const rows: string[][] = [];
-    let row: string[] = [];
+    const rows: (string | null)[][] = [];
+    let row: (string | null)[] = [];
     for (const id of ids) {
       if (weekdayOfId(id) === 1 && row.length > 0) {
         rows.push(row);
         row = [];
+      }
+      if (rows.length === 0 && row.length === 0) {
+        const offset = weekdayOfId(id) - 1; // Mon=0 ... Fri=4
+        for (let k = 0; k < offset; k++) row.push(null);
       }
       row.push(id);
     }
@@ -159,8 +165,9 @@ function MonthInner() {
               ))}
             </div>
             {weeks.map((row, i) => {
+              const realIds = row.filter((id): id is string => id !== null);
               const allOff =
-                row.length === 5 && row.every((id) => days.get(id)?.isNoSchool);
+                realIds.length === 5 && realIds.every((id) => days.get(id)?.isNoSchool);
               return (
                 <div key={i}>
                   {allOff && (
@@ -172,7 +179,8 @@ function MonthInner() {
                     </p>
                   )}
                   <div className="grid grid-cols-5 gap-1 sm:gap-2">
-                    {row.map((id) => {
+                    {row.map((id, j) => {
+                      if (id === null) return <div key={`blank-${j}`} />;
                       const day = days.get(id);
                       const off = day?.isNoSchool ?? false;
                       const isToday = id === todayId;
