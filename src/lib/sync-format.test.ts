@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { PLACEHOLDER_SUPPORT_EMAIL, supportEmail } from "./config";
 import { formatUpdatedAgo, staleLine } from "./format";
-import { datesToPrune, isMetaStale, mergeDay, parseOverrideLabels } from "./sync";
+import { datesToPrune, isMetaStale, mergeDay, parseOverrideLabels, parseOverridePaws } from "./sync";
 import { extractBreakfast, extractLunch } from "./sage";
 
 const EMPTY_LUNCH = extractLunch(undefined);
@@ -227,6 +227,61 @@ describe("parseOverrideLabels", () => {
     expect(parseOverrideLabels(null)).toEqual(new Map());
     expect(parseOverrideLabels("nope")).toEqual(new Map());
     expect(parseOverrideLabels(undefined)).toEqual(new Map());
+  });
+});
+
+describe("parseOverridePaws", () => {
+  it("keeps valid entries, trims, defaults week to null", () => {
+    expect(
+      parseOverridePaws({
+        "2026-09-23": {
+          title: "Advisory / GSL Prep",
+          details: ["5th: Advisory", "  ", 42, "GSL Locations"],
+          week: "PAWS 9/21-9/25",
+        },
+        "2026-09-24": { title: "All-School Study Hall" },
+      }),
+    ).toEqual(
+      new Map([
+        ["2026-09-23", { title: "Advisory / GSL Prep", details: ["5th: Advisory", "GSL Locations"], week: "PAWS 9/21-9/25" }],
+        ["2026-09-24", { title: "All-School Study Hall", details: [], week: null }],
+      ]),
+    );
+  });
+  it("skips bad keys, non-objects, and blank titles instead of failing", () => {
+    expect(
+      parseOverridePaws({
+        "2026-09-23": { title: "Assembly", details: ["Theater"] },
+        "09/23/2026": { title: "wrong shape" },
+        "2026-09-24": "just a string",
+        "2026-09-25": { title: "   " },
+        "2026-09-26": null,
+      }),
+    ).toEqual(new Map([["2026-09-23", { title: "Assembly", details: ["Theater"], week: null }]]));
+    expect(parseOverridePaws(null)).toEqual(new Map());
+    expect(parseOverridePaws(undefined)).toEqual(new Map());
+  });
+});
+
+describe("mergeDay paws", () => {
+  const base = {
+    dateId: "2026-09-23",
+    occurrence: undefined,
+    lunch: EMPTY_LUNCH,
+    breakfast: EMPTY_BREAKFAST,
+    sageEventLabel: undefined,
+    sageWeek: "09/20/2026",
+    todayId: "2026-09-18",
+  };
+  it("attaches the hand-supplied PAWS entry to the day", () => {
+    const day = mergeDay({
+      ...base,
+      pawsOverride: { title: "Advisory / GSL Prep", details: ["8th: GSL Prep"], week: "PAWS 9/21-9/25" },
+    });
+    expect(day.paws).toEqual({ title: "Advisory / GSL Prep", details: ["8th: GSL Prep"], week: "PAWS 9/21-9/25" });
+  });
+  it("defaults to null when no PAWS was supplied", () => {
+    expect(mergeDay(base).paws).toBeNull();
   });
 });
 

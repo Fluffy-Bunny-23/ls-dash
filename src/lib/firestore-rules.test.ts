@@ -91,5 +91,16 @@ describe.skipIf(!EMU)("firestore rules", () => {
     await expect(
       setDoc(doc(schoolDb, "days", "2099-01-01"), { hacked: true }),
     ).rejects.toThrow(/permission|no matching allow|false for .get.|permission_denied/i);
+
+    // 6. Hand-maintained overrides are cron-only: even verified school
+    // clients can neither read nor write them (PAWS content must never
+    // leak through an unauthenticated client bundle).
+    await adminDb.collection("overrides").doc("paws").set({
+      "2026-09-23": { title: "Advisory / GSL Prep", details: [], week: null },
+    });
+    await expect(getDoc(doc(schoolDb, "overrides", "paws"))).rejects.toThrow(/permission|no matching allow|false for .get.|permission_denied/i);
+    await expect(
+      setDoc(doc(schoolDb, "overrides", "paws"), { hacked: true }),
+    ).rejects.toThrow(/permission|no matching allow|false for .get.|permission_denied/i);
   });
 });

@@ -109,6 +109,28 @@ It only labels days already determined no-school; it never overrides an
 ABC/special school day. Clients can't read or write this doc (rules deny
 it); only the cron's Admin SDK reads it.
 
+## PAWS week (`overrides/paws`)
+
+PAWS arrives one week at a time, so it is hand-supplied like the reasons
+above and never hardcoded in the client bundle (logged-out chunks must
+reveal nothing school-specific). Firebase console → Firestore → collection
+`overrides`, doc `paws`, one field per date:
+
+```json
+{
+  "2026-09-23": {
+    "title": "Advisory / GSL Prep",
+    "details": ["5th: Advisory", "8th: GSL Prep"],
+    "week": "PAWS 9/21-9/25"
+  }
+}
+```
+
+The next cron sync bakes each entry into that day's `paws` field. The Today
+view shows it as a PAWS card; month cells show one `PAWS: …` line between
+lunch and breakfast. Dates with no entry render nothing. Clients can't read
+or write this doc; they only see `paws` on day docs they may already read.
+
 ## Google sign-in in privacy-hardened browsers (Helium, LibreWolf, …)
 
 Popup is the only sign-in flow and works even when the browser partitions

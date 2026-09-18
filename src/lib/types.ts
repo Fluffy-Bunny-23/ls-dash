@@ -34,6 +34,21 @@ export interface BreakfastInfo {
   dailyDetails?: MenuItemDetail[];
 }
 
+/**
+ * Hand-supplied PAWS schedule, baked in by the cron sync from the
+ * `overrides/paws` Firestore doc (one field per date). Absent on docs
+ * written before the field existed — readers must default to null.
+ * Lives on the day doc so only authenticated school users can read it;
+ * it must never be hardcoded in the client bundle (the logged-out wall
+ * reveals nothing school-specific).
+ */
+export interface PawsInfo {
+  title: string;
+  details: string[];
+  /** Week banner from the source table, e.g. "PAWS 9/21-9/25". */
+  week: string | null;
+}
+
 export interface DayDoc {
   date: string; // YYYY-MM-DD (America/Los_Angeles)
   dow: string; // Mon..Fri
@@ -44,6 +59,8 @@ export interface DayDoc {
   noSchoolLabel: string | null;
   lunch: LunchInfo;
   breakfast: BreakfastInfo;
+  /** PAWS schedule for the date, or null when none was supplied. */
+  paws: PawsInfo | null;
   sources: { icalUid: string | null; sageWeek: string | null };
   updatedAt: unknown; // serverTimestamp on write
 }

@@ -61,6 +61,34 @@ function emptyBreakfast() {
   return { entree: null, all: [], daily: [] };
 }
 
+const PAWS_WEEK = "PAWS 9/21-9/25";
+// Hand-supplied PAWS schedule for 09/21–09/25 from the school's PAWS table.
+// In prod this lives in the `overrides/paws` doc (one field per date) and
+// the cron bakes it into each day; the seed carries both so dev renders it.
+const PAWS_0921_0925: Record<string, { title: string; details: string[] }> = {
+  "2026-09-21": { title: "Academic Advisory", details: ["Advisory Locations"] },
+  "2026-09-22": { title: "Assembly", details: ["Theater"] },
+  "2026-09-23": {
+    title: "Advisory / GSL Prep",
+    details: ["5th: Advisory", "6th: Advisory", "7th: Advisory", "Advisory Locations", "8th: GSL Prep", "GSL Locations"],
+  },
+  "2026-09-24": {
+    title: "All-School Study Hall",
+    details: ["5th: MS 185", "6th: Theater", "7th: Off campus", "8th: Library"],
+  },
+  "2026-09-25": { title: "Advisory", details: ["Advisory Locations"] },
+};
+
+function schoolDay(id: string, dow: string, paws: { title: string; details: string[] } | null) {
+  return {
+    date: id, dow, abc: null, isSpecial: false, specialLabel: null,
+    isNoSchool: false, noSchoolLabel: null,
+    lunch: emptyLunch(), breakfast: emptyBreakfast(),
+    paws: paws ? { ...paws, week: PAWS_WEEK } : null,
+    sources: { icalUid: null, sageWeek: null }, updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+}
+
 async function main(): Promise<void> {
   const stamp = admin.firestore.FieldValue.serverTimestamp();
   const docs: Record<string, Record<string, unknown>> = {
@@ -182,6 +210,20 @@ async function main(): Promise<void> {
       },
       sources: { icalUid: null, sageWeek: "09/14/2026" }, updatedAt: stamp,
     },
+    // Tue 09-15 – Fri 09-18: school-week days with no verified dev data.
+    // Menus + ABC rotation for these postdate the HAR/feed captures, so dev
+    // shows "No menu posted" here; the daily cron fills them in prod.
+    "2026-09-15": schoolDay("2026-09-15", "Tue", null),
+    "2026-09-16": schoolDay("2026-09-16", "Wed", null),
+    "2026-09-17": schoolDay("2026-09-17", "Thu", null),
+    "2026-09-18": schoolDay("2026-09-18", "Fri", null),
+    // Mon 09-21 – Fri 09-25: PAWS week. Schedule is the hand-supplied table
+    // above (menus/ABC unknown until cron syncs, hence empty + null).
+    "2026-09-21": schoolDay("2026-09-21", "Mon", PAWS_0921_0925["2026-09-21"]),
+    "2026-09-22": schoolDay("2026-09-22", "Tue", PAWS_0921_0925["2026-09-22"]),
+    "2026-09-23": schoolDay("2026-09-23", "Wed", PAWS_0921_0925["2026-09-23"]),
+    "2026-09-24": schoolDay("2026-09-24", "Thu", PAWS_0921_0925["2026-09-24"]),
+    "2026-09-25": schoolDay("2026-09-25", "Fri", PAWS_0921_0925["2026-09-25"]),
     // Sat 09-12: SYNTHETIC weekend doc — must never be navigable/rendered.
     "2026-09-12": {
       date: "2026-09-12", dow: "Sat", abc: null, isSpecial: false, specialLabel: null,
@@ -203,6 +245,17 @@ async function main(): Promise<void> {
   for (const [id, data] of Object.entries(docs)) {
     await db.collection("days").doc(id).set(data);
     console.log("seeded", id);
+  }
+  // Mirror of the hand-maintained prod doc: cron reads `overrides/paws`
+  // (one field per date) and bakes it into each day. Seeded so dev shows
+  // where the PAWS content comes from end to end.
+  {
+    const fields: Record<string, unknown> = {};
+    for (const [id, paws] of Object.entries(PAWS_0921_0925)) {
+      fields[id] = { ...paws, week: PAWS_WEEK };
+    }
+    await db.collection("overrides").doc("paws").set(fields);
+    console.log("seeded overrides/paws");
   }
   await db.collection("meta").doc("sync").set({
     lastSuccess: new Date().toISOString(),

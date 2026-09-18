@@ -18,7 +18,7 @@ import {
   type SageMonthlyEvent,
   type SageWeek,
 } from "@/lib/sage";
-import { datesToPrune, mergeDay, parseOverrideLabels } from "@/lib/sync";
+import { datesToPrune, mergeDay, parseOverrideLabels, parseOverridePaws } from "@/lib/sync";
 
 export interface SyncDeps {
   fetchText: (url: string) => Promise<string>;
@@ -108,6 +108,15 @@ export async function runSync(deps: SyncDeps): Promise<SyncResult> {
   } catch (e) {
     warnings.push(`overrides/reasons unreadable: ${(e as Error)?.message ?? e}`);
   }
+  // Hand-supplied PAWS week (Firebase console: `overrides/paws`, one field
+  // per date). Best-effort like reasons: missing/malformed just means none.
+  let pawsOverrides = new Map<string, import("./types").PawsInfo>();
+  try {
+    const snap = await db.collection("overrides").doc("paws").get();
+    if (snap.exists) pawsOverrides = parseOverridePaws(snap.data());
+  } catch (e) {
+    warnings.push(`overrides/paws unreadable: ${(e as Error)?.message ?? e}`);
+  }
   const batch = db.batch();
   let datesWritten = 0;
   let lunchItemsTotal = 0;
@@ -130,6 +139,7 @@ export async function runSync(deps: SyncDeps): Promise<SyncResult> {
       sageWeek: anchor,
       todayId,
       overrideLabel: overrides.get(id),
+      pawsOverride: pawsOverrides.get(id),
     });
     batch.set(db.collection("days").doc(id), {
       ...merged,
