@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useMonthDays } from "@/lib/use-days";
 import { monthGridWeeks, todayPtId } from "@/lib/dates";
 import { pickCellEntree } from "@/lib/sage";
+import { getPaws, pawsSummary } from "@/lib/paws";
 import type { DayDoc } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -38,12 +39,29 @@ function shiftMonth(m: string, delta: number): string {
   return `${t.getUTCFullYear()}-${String(t.getUTCMonth() + 1).padStart(2, "0")}`;
 }
 
-function CellBody({ day }: { day: DayDoc | undefined }) {
-  if (!day) return <p className="text-xs text-stone-400">—</p>;
+function CellBody({ day, dateId }: { day: DayDoc | undefined; dateId: string }) {
+  const paws = getPaws(dateId);
+  if (!day) {
+    // Static PAWS week renders even before Firestore has the day.
+    if (paws) {
+      return (
+        <div className="min-w-0">
+          <p
+            className="truncate text-[11px] font-medium text-stone-700"
+            data-testid={`paws-month-${dateId}`}
+            title={pawsSummary(paws)}
+          >
+            {pawsSummary(paws)}
+          </p>
+        </div>
+      );
+    }
+    return <p className="text-xs text-stone-400">—</p>;
+  }
   const lunchEntree = pickCellEntree(day.lunch);
   return (
     <div className="min-w-0">
-      {/* Priority: 1) day off / special, 2) ABC (top-right corner), 3) lunch, 4) breakfast */}
+      {/* Priority: 1) day off / special, 2) ABC (top-right corner), 3) lunch, 4) PAWS, 5) breakfast */}
       {day.isNoSchool ? (
         <p className="truncate text-xs font-semibold text-red-800" title={day.noSchoolLabel ?? "No school"}>
           {day.noSchoolLabel ?? "No school"}
@@ -61,6 +79,15 @@ function CellBody({ day }: { day: DayDoc | undefined }) {
             </p>
           ) : (
             <p className="text-xs text-stone-400">No menu posted</p>
+          )}
+          {paws && (
+            <p
+              className="truncate text-[11px] font-medium text-stone-700"
+              data-testid={`paws-month-${dateId}`}
+              title={pawsSummary(paws)}
+            >
+              {pawsSummary(paws)}
+            </p>
           )}
           {day.breakfast.entree && (
             <p className="truncate text-[11px] text-stone-500" title={`Breakfast: ${day.breakfast.entree}`}>
@@ -193,7 +220,7 @@ function MonthInner() {
                               </Badge>
                             )}
                           </div>
-                          <CellBody day={day} />
+                          <CellBody day={day} dateId={id} />
                         </Link>
                       );
                     })}

@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useDay } from "@/lib/use-days";
+import { getPaws, PAWS_WEEK_LABEL } from "@/lib/paws";
 import {
   advancePastWeekendForward,
   isWeekendId,
@@ -252,6 +253,33 @@ function DetailedMenu({
   );
 }
 
+function PawsCard({ dateId }: { dateId: string }) {
+  const paws = getPaws(dateId);
+  if (!paws) return null;
+  return (
+    <Card data-testid="paws-card">
+      <CardHeader className="pb-2">
+        <CardTitle>PAWS</CardTitle>
+        <p className="text-xs text-stone-500">{PAWS_WEEK_LABEL}</p>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm font-medium text-stone-900" data-testid="paws-title">
+          {paws.title}
+        </p>
+        {paws.details.length > 0 && (
+          <ul className="mt-1 space-y-0.5">
+            {paws.details.map((line) => (
+              <li key={line} className="text-sm text-stone-600">
+                {line}
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function TodayInner() {
   const router = useRouter();
   const params = useSearchParams();
@@ -329,11 +357,14 @@ function TodayInner() {
             <Skeleton className="h-32 w-full" />
           </>
         ) : !day ? (
-          <Card>
-            <CardContent className="pt-4 text-center text-sm text-stone-500">
-              No data for this day yet.
-            </CardContent>
-          </Card>
+          <>
+            <PawsCard dateId={dayId} />
+            <Card>
+              <CardContent className="pt-4 text-center text-sm text-stone-500">
+                No data for this day yet.
+              </CardContent>
+            </Card>
+          </>
         ) : (
           <>
             <div className="flex flex-wrap items-center gap-3" data-testid="day-badges">
@@ -361,6 +392,7 @@ function TodayInner() {
 
             {!day.isNoSchool && (
               <>
+                <PawsCard dateId={dayId} />
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle>Lunch</CardTitle>
