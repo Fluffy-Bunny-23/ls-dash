@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useMonthDays } from "@/lib/use-days";
-import { monthWeekdayIds, weekdayOfId } from "@/lib/dates";
+import { monthGridWeeks, todayPtId } from "@/lib/dates";
 import { pickCellEntree } from "@/lib/sage";
 import type { DayDoc } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -41,13 +41,31 @@ function shiftMonth(m: string, delta: number): string {
 function CellBody({ day }: { day: DayDoc | undefined }) {
   if (!day) return <p className="text-xs text-stone-400">—</p>;
   const lunchEntree = pickCellEntree(day.lunch);
+  // PAWS comes from the day doc (authenticated Firestore read), never from
+  // the client bundle, so logged-out chunks reveal nothing school-specific.
+  // No "PAWS:" prefix: on mobile it is a body line, on desktop it sits in
+  // the cell header next to the day number. The mobile line reuses the old
+  // breakfast slot and styling (small gray line under the meal).
+  const paws = day.paws ?? null;
+  const pawsLine = paws ? (
+    <p
+      className="truncate text-[11px] text-stone-500 sm:hidden"
+      data-testid={`paws-month-${day.date}`}
+      title={paws.title}
+    >
+      {paws.title}
+    </p>
+  ) : null;
   return (
     <div className="min-w-0">
-      {/* Priority: 1) day off / special, 2) ABC (top-right corner), 3) lunch, 4) breakfast */}
+      {/* Priority: 1) day off / special, 2) ABC (top-right corner), 3) lunch, 4) PAWS, 5) breakfast (desktop only) */}
       {day.isNoSchool ? (
-        <p className="truncate text-xs font-semibold text-red-800" title={day.noSchoolLabel ?? "No school"}>
-          {day.noSchoolLabel ?? "No school"}
-        </p>
+        <>
+          <p className="truncate text-xs font-semibold text-red-800" title={day.noSchoolLabel ?? "No school"}>
+            {day.noSchoolLabel ?? "No school"}
+          </p>
+          {pawsLine}
+        </>
       ) : (
         <>
           {day.isSpecial && (
@@ -62,8 +80,9 @@ function CellBody({ day }: { day: DayDoc | undefined }) {
           ) : (
             <p className="text-xs text-stone-400">No menu posted</p>
           )}
+          {pawsLine}
           {day.breakfast.entree && (
-            <p className="truncate text-[11px] text-stone-500" title={`Breakfast: ${day.breakfast.entree}`}>
+            <p className="hidden truncate text-[11px] text-stone-500 sm:block" title={`Breakfast: ${day.breakfast.entree}`}>
               B: {day.breakfast.entree}
             </p>
           )}
@@ -84,23 +103,11 @@ function MonthInner() {
     document.title = user && schoolUser ? "LS Dash" : "Please sign in to continue";
   }, [user, schoolUser]);
 
-  const ids = useMemo(() => monthWeekdayIds(month), [month]);
   const { days, loaded } = useMonthDays(user && schoolUser ? month : "0000-00");
+  const todayId = useMemo(() => todayPtId(), []);
 
-  // Weekday-only rows: chunk Mon–Fri ids into Mon-start weeks.
-  const weeks = useMemo(() => {
-    const rows: string[][] = [];
-    let row: string[] = [];
-    for (const id of ids) {
-      if (weekdayOfId(id) === 1 && row.length > 0) {
-        rows.push(row);
-        row = [];
-      }
-      row.push(id);
-    }
-    if (row.length > 0) rows.push(row);
-    return rows;
-  }, [ids]);
+  // Weekday-only Mon–Fri grid; blanks pad a mid-week 1st into its column.
+  const weeks = useMemo(() => monthGridWeeks(month), [month]);
 
   if (authLoading) {
     return (
@@ -158,8 +165,9 @@ function MonthInner() {
               ))}
             </div>
             {weeks.map((row, i) => {
+              const realIds = row.filter((id): id is string => id !== null);
               const allOff =
-                row.length === 5 && row.every((id) => days.get(id)?.isNoSchool);
+                realIds.length === 5 && realIds.every((id) => days.get(id)?.isNoSchool);
               return (
                 <div key={i}>
                   {allOff && (
@@ -171,15 +179,18 @@ function MonthInner() {
                     </p>
                   )}
                   <div className="grid grid-cols-5 gap-1 sm:gap-2">
-                    {row.map((id) => {
+                    {row.map((id, j) => {
+                      if (id === null) return <div key={`blank-${j}`} />;
                       const day = days.get(id);
                       const off = day?.isNoSchool ?? false;
+                      const isToday = id === todayId;
                       return (
                         <Link
                           key={id}
                           href={`/?d=${id}`}
                           data-date={id}
                           data-noschool={off ? "true" : "false"}
+                          data-today={isToday ? "true" : "false"}
                           title={id}
                           className={cn(
                             "min-h-20 rounded-lg border bg-white p-1.5 text-left hover:border-secondary sm:min-h-24 sm:p-2",
@@ -188,12 +199,22 @@ function MonthInner() {
                               : day?.isSpecial
                                 ? "border-amber-300"
                                 : "border-stone-200",
+                            isToday && "border-blue-500",
                           )}
                         >
                           <div className="flex items-start justify-between gap-1">
                             <p className="text-xs font-semibold text-stone-500">
                               {Number(id.slice(8, 10))}
                             </p>
+                            {day?.paws && (
+                              <p
+                                className="hidden min-w-0 flex-1 truncate text-right text-[11px] font-medium text-stone-700 sm:block"
+                                data-testid={`paws-month-${id}`}
+                                title={day.paws.title}
+                              >
+                                {day.paws.title}
+                              </p>
+                            )}
                             {day?.abc && !off && (
                               <Badge variant={day.isSpecial ? "secondary" : "default"}>
                                 {day.abc}

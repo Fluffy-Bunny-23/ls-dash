@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useDay } from "@/lib/use-days";
+import type { PawsInfo } from "@/lib/types";
 import {
   advancePastWeekendForward,
   isWeekendId,
@@ -252,6 +253,32 @@ function DetailedMenu({
   );
 }
 
+function PawsCard({ paws }: { paws: PawsInfo | null }) {
+  if (!paws) return null;
+  return (
+    <Card data-testid="paws-card">
+      <CardHeader className="pb-2">
+        <CardTitle>PAWS</CardTitle>
+        {paws.week && <p className="text-xs text-stone-500">{paws.week}</p>}
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm font-medium text-stone-900" data-testid="paws-title">
+          {paws.title}
+        </p>
+        {paws.details.length > 0 && (
+          <ul className="mt-1 space-y-0.5">
+            {paws.details.map((line) => (
+              <li key={line} className="text-sm text-stone-600">
+                {line}
+              </li>
+            ))}
+          </ul>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function TodayInner() {
   const router = useRouter();
   const params = useSearchParams();
@@ -358,6 +385,9 @@ function TodayInner() {
                 {day.noSchoolLabel}
               </p>
             )}
+            {/* PAWS comes from the day doc (authenticated read), shown on
+                school and no-school days alike so hand input never hides. */}
+            <PawsCard paws={day.paws ?? null} />
 
             {!day.isNoSchool && (
               <>
