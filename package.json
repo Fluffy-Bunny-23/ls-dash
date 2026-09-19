@@ -9,6 +9,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "seed": "tsx scripts/seed.ts",
+    "paws": "tsx scripts/update-paws.ts",
     "emulators": "firebase emulators:start --only auth,firestore",
     "setup": "node scripts/render-rules.mjs"
   },

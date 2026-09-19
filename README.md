@@ -131,6 +131,20 @@ view shows it as a PAWS card; month cells show one `PAWS: …` line between
 lunch and breakfast. Dates with no entry render nothing. Clients can't read
 or write this doc; they only see `paws` on day docs they may already read.
 
+Scripted update (screenshot -> Firebase -> client, no redeploy): transcribe
+the week's table to a JSON file (see `AGENTS.md` "PAWS schedule update" for
+the agent workflow and accepted shapes), then:
+
+```sh
+./scripts/update-paws.sh /tmp/paws-2026-09-28.json --dry-run
+./scripts/update-paws.sh /tmp/paws-2026-09-28.json   # prod: needs FIREBASE_PROJECT_ID + service account
+```
+
+The script validates the file, merges it into `overrides/paws` (so the next
+cron keeps it) AND patches `days/<date>` `paws` immediately, so signed-in
+Today + Month views pick it up via their live `onSnapshot` subscriptions.
+Emulator preview: export `FIRESTORE_EMULATOR_HOST=127.0.0.1:8081` first.
+
 ## Google sign-in in privacy-hardened browsers (Helium, LibreWolf, …)
 
 Popup is the only sign-in flow and works even when the browser partitions
