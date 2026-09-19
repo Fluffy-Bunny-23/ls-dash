@@ -29,6 +29,7 @@ import { join } from "node:path";
 import admin from "firebase-admin";
 import { normalizePawsFileInput } from "../src/lib/paws-input";
 import { DEMO_PROJECT_ID } from "../src/lib/config";
+import { dowShort } from "../src/lib/dates";
 
 function loadEnv(path: string): void {
   try {
@@ -163,23 +164,44 @@ async function main(): Promise<void> {
     console.log("overrides/paws merged.");
   }
 
-  // 2. days/<date> — immediate client visibility (Today + Month subscribe via
-  //    onSnapshot; no redeploy needed). Merge so lunch/breakfast/ABC survive.
+  // 2. days/<date> — immediate client visibility (Today reads by ID, Month
+  //    queries on the `date` field via onSnapshot; no redeploy needed).
+  //    Existing docs get a paws-only merge so lunch/breakfast/ABC survive.
+  //    Missing docs are scaffolded with safe empty defaults — a paws-only doc
+  //    would be invisible to the Month query (no `date` field) and would crash
+  //    both views, which read day.lunch/day.breakfast unconditionally.
   const stamp = admin.firestore.FieldValue.serverTimestamp();
   let patched = 0;
   const missing: string[] = [];
   for (const [id, paws] of entries) {
     const ref = db.collection("days").doc(id);
     const snap = await ref.get();
-    if (!snap.exists) missing.push(id);
-    await ref.set({ paws: { ...paws }, updatedAt: stamp }, { merge: true });
+    if (!snap.exists) {
+      missing.push(id);
+      await ref.set({
+        date: id,
+        dow: dowShort(id),
+        abc: null,
+        isSpecial: false,
+        specialLabel: null,
+        isNoSchool: false,
+        noSchoolLabel: null,
+        lunch: { entree: null, special: null, feature: null, soups: [], sides: [], all: [] },
+        breakfast: { entree: null, all: [], daily: [] },
+        paws: { ...paws },
+        sources: { icalUid: null, sageWeek: null },
+        updatedAt: stamp,
+      });
+    } else {
+      await ref.set({ paws: { ...paws }, updatedAt: stamp }, { merge: true });
+    }
     patched++;
   }
   console.log(`days/* patched: ${patched}.`);
   if (missing.length > 0) {
     console.log(
-      `Note: ${missing.join(", ")} had no days/* doc yet (created with paws only; ` +
-        "the next cron sync fills in ABC/menus). overrides/paws still carries them.",
+      `Note: ${missing.join(", ")} had no days/* doc yet (scaffolded with empty ` +
+        "menus; the next cron sync fills in ABC/menus). overrides/paws still carries them.",
     );
   }
   console.log(

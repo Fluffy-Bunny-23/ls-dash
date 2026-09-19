@@ -46,6 +46,30 @@ describe("normalizePawsFileInput", () => {
     ).toThrow(/PAWS file invalid/);
   });
 
+  it("rejects impossible dates and weekends", () => {
+    expect(() =>
+      normalizePawsFileInput({ "2026-02-30": { title: "Assembly" } }),
+    ).toThrow(/not a real calendar date/);
+    // 2026-09-26 is a Saturday.
+    expect(() =>
+      normalizePawsFileInput({ "2026-09-26": { title: "Assembly" } }),
+    ).toThrow(/weekend/);
+  });
+
+  it("rejects overlong values instead of truncating them", () => {
+    const longTitle = "A".repeat(121);
+    expect(() =>
+      normalizePawsFileInput({ "2026-09-28": { title: longTitle } }),
+    ).toThrow(/max 120/);
+    expect(() =>
+      normalizePawsFileInput({ "2026-09-28": { title: "Ok", details: ["B".repeat(121)] } }),
+    ).toThrow(/max 120/);
+    expect(() =>
+      normalizePawsFileInput({ "2026-09-28": { title: "Ok", week: "W".repeat(61) } }),
+    ).toThrow(/max 60/);
+    expect(() => normalizePawsFileInput({}, "W".repeat(61))).toThrow(/max 60/);
+  });
+
   it("rejects empty and oversized payloads", () => {
     expect(() => normalizePawsFileInput({})).toThrow(/no dates found/);
     expect(() => normalizePawsFileInput(null)).toThrow(/must be a JSON object/);

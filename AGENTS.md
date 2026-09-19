@@ -61,7 +61,8 @@ does both writes the app needs.
    ```
    The script merges into `overrides/paws` (survives the next cron) AND patches
    `days/<date>` `paws` (immediate client visibility). Missing `days/*` docs
-   are created paws-only and noted — the next cron fills in ABC/menus.
+   are scaffolded with empty menus plus the new `paws` (so both views render
+   safely) and noted — the next cron fills in ABC/menus.
 5. Verify: the script prints every date written — read it back and compare
    against the screenshot (titles, details, week). Report any `days/*` doc
    that was missing. Run `npm test` if you touched validation/sync code.

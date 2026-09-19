@@ -2,8 +2,27 @@ import type { PawsInfo } from "./types";
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
-function clean(s: string, max: number): string {
-  return s.replace(/\s+/g, " ").trim().slice(0, max);
+function norm(s: string): string {
+  return s.replace(/\s+/g, " ").trim();
+}
+
+/** Real calendar date check: rejects impossible dates like 2026-02-30. */
+function isRealDate(id: string): boolean {
+  const y = Number(id.slice(0, 4));
+  const m = Number(id.slice(5, 7));
+  const d = Number(id.slice(8, 10));
+  if (m < 1 || m > 12 || d < 1 || d > 31) return false;
+  const t = new Date(Date.UTC(y, m - 1, d));
+  return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d;
+}
+
+/** Saturday/Sunday check on the calendar date (PAWS runs Mon-Fri). */
+function isWeekendDate(id: string): boolean {
+  const y = Number(id.slice(0, 4));
+  const m = Number(id.slice(5, 7));
+  const d = Number(id.slice(8, 10));
+  const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  return dow === 0 || dow === 6;
 }
 
 /**
@@ -30,10 +49,13 @@ export function normalizePawsFileInput(data: unknown, defaultWeek?: string): Map
   }
   const obj = data as Record<string, unknown>;
 
-  let weekDefault: string | null =
-    typeof defaultWeek === "string" && defaultWeek.trim()
-      ? clean(defaultWeek, 60)
-      : null;
+  let weekDefault: string | null = null;
+  if (typeof defaultWeek === "string" && defaultWeek.trim()) {
+    weekDefault = norm(defaultWeek);
+    if (weekDefault.length > 60) {
+      throw new Error(`PAWS file invalid:\n- default --week is ${weekDefault.length} chars (max 60)`);
+    }
+  }
 
   let daysObj: Record<string, unknown>;
   if ("days" in obj) {
@@ -43,7 +65,9 @@ export function normalizePawsFileInput(data: unknown, defaultWeek?: string): Map
     }
     daysObj = days as Record<string, unknown>;
     if (typeof obj["week"] === "string" && obj["week"].trim()) {
-      weekDefault = clean(obj["week"] as string, 60);
+      const w = norm(obj["week"] as string);
+      if (w.length > 60) fail(`shared "week" is ${w.length} chars (max 60)`);
+      else weekDefault = w;
     }
     for (const k of Object.keys(obj)) {
       if (k !== "days" && k !== "week") fail(`unknown top-level key "${k}" (want only "week" + "days")`);
@@ -62,18 +86,29 @@ export function normalizePawsFileInput(data: unknown, defaultWeek?: string): Map
       fail(`"${id}": not YYYY-MM-DD`);
       continue;
     }
+    if (!isRealDate(id)) {
+      fail(`"${id}": not a real calendar date`);
+      continue;
+    }
+    if (isWeekendDate(id)) {
+      fail(`"${id}": falls on a weekend (PAWS runs Mon-Fri)`);
+      continue;
+    }
     const v = daysObj[id];
     if (!v || typeof v !== "object" || Array.isArray(v)) {
       fail(`"${id}": must be { title, details?, week? }`);
       continue;
     }
     const rec = v as Record<string, unknown>;
-    if (typeof rec["title"] !== "string" || !clean(rec["title"], 120)) {
+    if (typeof rec["title"] !== "string" || !norm(rec["title"])) {
       fail(`"${id}": missing/blank "title"`);
       continue;
     }
-    const title = clean(rec["title"] as string, 120);
-    if ((rec["title"] as string).length > 200) fail(`"${id}": "title" implausibly long, check transcription`);
+    const title = norm(rec["title"] as string);
+    if (title.length > 120) {
+      fail(`"${id}": "title" is ${title.length} chars (max 120)`);
+      continue;
+    }
 
     let details: string[] = [];
     if (rec["details"] !== undefined) {
@@ -83,22 +118,36 @@ export function normalizePawsFileInput(data: unknown, defaultWeek?: string): Map
       }
       const raw = rec["details"] as unknown[];
       if (raw.length > 12) fail(`"${id}": "details" has ${raw.length} items (max 12)`);
+      let badDetail: string | null = null;
       for (const d of raw) {
-        if (typeof d !== "string" || !clean(d, 120)) {
-          fail(`"${id}": every "details" item must be a non-blank string`);
+        if (typeof d !== "string" || !norm(d)) {
+          badDetail = "every \"details\" item must be a non-blank string";
+          break;
+        }
+        if (norm(d).length > 120) {
+          badDetail = `"details" item is ${norm(d).length} chars (max 120)`;
           break;
         }
       }
-      details = (raw as string[]).filter((d) => clean(d, 120)).map((d) => clean(d, 120));
+      if (badDetail) {
+        fail(`"${id}": ${badDetail}`);
+        continue;
+      }
+      details = (raw as string[]).map((d) => norm(d));
     }
 
     let week: string | null = weekDefault;
     if (rec["week"] !== undefined) {
-      if (typeof rec["week"] !== "string" || !clean(rec["week"], 60)) {
+      if (typeof rec["week"] !== "string" || !norm(rec["week"] as string)) {
         fail(`"${id}": "week" must be a non-blank string`);
         continue;
       }
-      week = clean(rec["week"] as string, 60);
+      const w = norm(rec["week"] as string);
+      if (w.length > 60) {
+        fail(`"${id}": "week" is ${w.length} chars (max 60)`);
+        continue;
+      }
+      week = w;
     }
     entries.set(id, { title, details, week });
   }
