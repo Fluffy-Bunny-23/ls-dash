@@ -83,15 +83,17 @@ function schoolDay(
   id: string,
   dow: string,
   menus: { lunch: Record<string, unknown>; breakfast: Record<string, unknown> },
+  abc: { letter: "A" | "B" | "C"; uid: string },
   paws: { title: string; details: string[] } | null,
   sageWeek: string,
 ) {
   return {
-    date: id, dow, abc: null, isSpecial: false, specialLabel: null,
+    date: id, dow, abc: abc.letter, isSpecial: false, specialLabel: null,
     isNoSchool: false, noSchoolLabel: null,
     lunch: menus.lunch, breakfast: menus.breakfast,
     paws: paws ? { ...paws, week: PAWS_WEEK } : null,
-    sources: { icalUid: null, sageWeek }, updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    sources: { icalUid: `${abc.uid}@www.example-school.org`, sageWeek },
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
   };
 }
 
@@ -296,15 +298,13 @@ async function main(): Promise<void> {
       sources: { icalUid: "12485798@www.example-school.org", sageWeek: "09/06/2026" }, updatedAt: stamp,
     },
     // Mon 09-14: LIVE Sage week of 09/14/2026 (fetched 2026-09-14, extractor
-    // output verbatim). The month overview must show the Main Ingredient
+    // output verbatim) + MS B day from the live calendar_436.ics feed
+    // (UID 12485804). The month overview must show the Main Ingredient
     // station entrée ("Chicken Tenders"), not Entrées[0]
-    // ("Honey-Glazed Ham"). ABC is null: the school feed URL is a placeholder
-    // in local dev, so no ABC rotation is verifiable offline — a school day
-    // with good Sage service and no ABC is an established pattern (see
-    // mergeDay's 2026-09-03 case). No single-day Daily probe was run for
+    // ("Honey-Glazed Ham"). No single-day Daily probe was run for
     // 09-14, so breakfast.daily is [].
     "2026-09-14": {
-      date: "2026-09-14", dow: "Mon", abc: null, isSpecial: false, specialLabel: null,
+      date: "2026-09-14", dow: "Mon", abc: "B", isSpecial: false, specialLabel: null,
       isNoSchool: false, noSchoolLabel: null,
       lunch: {
         entree: "Honey-Glazed Ham", special: "Chicken Finger Dipping Bar", feature: null,
@@ -338,20 +338,22 @@ async function main(): Promise<void> {
         all: ["Bacon", "Turkey Bacon", "Western Scrambled Eggs", "Bagel & Cream Cheese", "Sticky Rice", "Cinnamon Rolls", "Croissants", "Pineapple Cup", "Red Grapes Cup", "Strawberry Cup", "S'mores Pudding Parfait", "Strawberry Shortcake Parfait"],
         daily: [],
       },
-      sources: { icalUid: null, sageWeek: "09/14/2026" }, updatedAt: stamp,
+      sources: { icalUid: "12485804@www.example-school.org", sageWeek: "09/14/2026" }, updatedAt: stamp,
     },
-    // Tue 09-15 – Fri 09-18: LIVE Sage menus above; ABC unverifiable offline.
-    "2026-09-15": schoolDay("2026-09-15", "Tue", LIVE_MENUS["2026-09-15"], null, "09/14/2026"),
-    "2026-09-16": schoolDay("2026-09-16", "Wed", LIVE_MENUS["2026-09-16"], null, "09/14/2026"),
-    "2026-09-17": schoolDay("2026-09-17", "Thu", LIVE_MENUS["2026-09-17"], null, "09/14/2026"),
-    "2026-09-18": schoolDay("2026-09-18", "Fri", LIVE_MENUS["2026-09-18"], null, "09/14/2026"),
-    // Mon 09-21 – Fri 09-25: PAWS week. Menus are the LIVE Sage week above;
-    // schedule is the hand-supplied table (also mirrored in overrides/paws).
-    "2026-09-21": schoolDay("2026-09-21", "Mon", LIVE_MENUS["2026-09-21"], PAWS_0921_0925["2026-09-21"], "09/21/2026"),
-    "2026-09-22": schoolDay("2026-09-22", "Tue", LIVE_MENUS["2026-09-22"], PAWS_0921_0925["2026-09-22"], "09/21/2026"),
-    "2026-09-23": schoolDay("2026-09-23", "Wed", LIVE_MENUS["2026-09-23"], PAWS_0921_0925["2026-09-23"], "09/21/2026"),
-    "2026-09-24": schoolDay("2026-09-24", "Thu", LIVE_MENUS["2026-09-24"], PAWS_0921_0925["2026-09-24"], "09/21/2026"),
-    "2026-09-25": schoolDay("2026-09-25", "Fri", LIVE_MENUS["2026-09-25"], PAWS_0921_0925["2026-09-25"], "09/21/2026"),
+    // Tue 09-15 – Fri 09-18: LIVE Sage menus above; ABC + UIDs from the
+    // live calendar_436.ics feed (same source as the 09-08 HAR docs).
+    "2026-09-15": schoolDay("2026-09-15", "Tue", LIVE_MENUS["2026-09-15"], { letter: "C", uid: "12485806" }, null, "09/14/2026"),
+    "2026-09-16": schoolDay("2026-09-16", "Wed", LIVE_MENUS["2026-09-16"], { letter: "A", uid: "12485808" }, null, "09/14/2026"),
+    "2026-09-17": schoolDay("2026-09-17", "Thu", LIVE_MENUS["2026-09-17"], { letter: "B", uid: "12485810" }, null, "09/14/2026"),
+    "2026-09-18": schoolDay("2026-09-18", "Fri", LIVE_MENUS["2026-09-18"], { letter: "C", uid: "12485814" }, null, "09/14/2026"),
+    // Mon 09-21 – Fri 09-25: PAWS week. Menus are the LIVE Sage week above,
+    // ABC + UIDs from the live feed; schedule is the hand-supplied table
+    // (also mirrored in overrides/paws).
+    "2026-09-21": schoolDay("2026-09-21", "Mon", LIVE_MENUS["2026-09-21"], { letter: "A", uid: "12485818" }, PAWS_0921_0925["2026-09-21"], "09/21/2026"),
+    "2026-09-22": schoolDay("2026-09-22", "Tue", LIVE_MENUS["2026-09-22"], { letter: "B", uid: "12485821" }, PAWS_0921_0925["2026-09-22"], "09/21/2026"),
+    "2026-09-23": schoolDay("2026-09-23", "Wed", LIVE_MENUS["2026-09-23"], { letter: "C", uid: "12485824" }, PAWS_0921_0925["2026-09-23"], "09/21/2026"),
+    "2026-09-24": schoolDay("2026-09-24", "Thu", LIVE_MENUS["2026-09-24"], { letter: "A", uid: "12485826" }, PAWS_0921_0925["2026-09-24"], "09/21/2026"),
+    "2026-09-25": schoolDay("2026-09-25", "Fri", LIVE_MENUS["2026-09-25"], { letter: "B", uid: "12485830" }, PAWS_0921_0925["2026-09-25"], "09/21/2026"),
     // Sat 09-12: SYNTHETIC weekend doc — must never be navigable/rendered.
     "2026-09-12": {
       date: "2026-09-12", dow: "Sat", abc: null, isSpecial: false, specialLabel: null,
