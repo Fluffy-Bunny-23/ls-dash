@@ -44,11 +44,12 @@ function CellBody({ day }: { day: DayDoc | undefined }) {
   // PAWS comes from the day doc (authenticated Firestore read), never from
   // the client bundle, so logged-out chunks reveal nothing school-specific.
   // No "PAWS:" prefix: on mobile it is a body line, on desktop it sits in
-  // the cell header next to the day number.
+  // the cell header next to the day number. The mobile line reuses the old
+  // breakfast slot and styling (small gray line under the meal).
   const paws = day.paws ?? null;
   const pawsLine = paws ? (
     <p
-      className="truncate text-[11px] font-medium text-stone-700 sm:hidden"
+      className="truncate text-[11px] text-stone-500 sm:hidden"
       data-testid={`paws-month-${day.date}`}
       title={paws.title}
     >
