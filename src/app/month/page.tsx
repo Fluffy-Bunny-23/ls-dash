@@ -43,19 +43,21 @@ function CellBody({ day }: { day: DayDoc | undefined }) {
   const lunchEntree = pickCellEntree(day.lunch);
   // PAWS comes from the day doc (authenticated Firestore read), never from
   // the client bundle, so logged-out chunks reveal nothing school-specific.
+  // No "PAWS:" prefix: on mobile it is a body line, on desktop it sits in
+  // the cell header next to the day number.
   const paws = day.paws ?? null;
   const pawsLine = paws ? (
     <p
-      className="truncate text-[11px] font-medium text-stone-700"
+      className="truncate text-[11px] font-medium text-stone-700 sm:hidden"
       data-testid={`paws-month-${day.date}`}
-      title={`PAWS: ${paws.title}`}
+      title={paws.title}
     >
-      PAWS: {paws.title}
+      {paws.title}
     </p>
   ) : null;
   return (
     <div className="min-w-0">
-      {/* Priority: 1) day off / special, 2) ABC (top-right corner), 3) lunch, 4) PAWS, 5) breakfast */}
+      {/* Priority: 1) day off / special, 2) ABC (top-right corner), 3) lunch, 4) PAWS, 5) breakfast (desktop only) */}
       {day.isNoSchool ? (
         <>
           <p className="truncate text-xs font-semibold text-red-800" title={day.noSchoolLabel ?? "No school"}>
@@ -79,7 +81,7 @@ function CellBody({ day }: { day: DayDoc | undefined }) {
           )}
           {pawsLine}
           {day.breakfast.entree && (
-            <p className="truncate text-[11px] text-stone-500" title={`Breakfast: ${day.breakfast.entree}`}>
+            <p className="hidden truncate text-[11px] text-stone-500 sm:block" title={`Breakfast: ${day.breakfast.entree}`}>
               B: {day.breakfast.entree}
             </p>
           )}
@@ -203,6 +205,15 @@ function MonthInner() {
                             <p className="text-xs font-semibold text-stone-500">
                               {Number(id.slice(8, 10))}
                             </p>
+                            {day?.paws && (
+                              <p
+                                className="hidden min-w-0 flex-1 truncate text-right text-[11px] font-medium text-stone-700 sm:block"
+                                data-testid={`paws-month-${id}`}
+                                title={day.paws.title}
+                              >
+                                {day.paws.title}
+                              </p>
+                            )}
                             {day?.abc && !off && (
                               <Badge variant={day.isSpecial ? "secondary" : "default"}>
                                 {day.abc}
